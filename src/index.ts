@@ -8,6 +8,8 @@ export {
   RepositoryDiscovery,
   RepositoryIngestor,
   InMemorySelectionStore,
+  BranchTracker,
+  InMemoryRefStore,
   loadGitHubAppConfig,
   createGitHubAppJwt,
   InstallationTokenClient,

@@ -11,7 +11,11 @@ export type GitHubErrorCode =
   | "REPOSITORY_NOT_SELECTED"
   | "REPOSITORY_NOT_ACCESSIBLE"
   | "CLONE_FAILED"
-  | "INGEST_FAILED";
+  | "INGEST_FAILED"
+  | "GIT_FAILED"
+  | "INVALID_WEBHOOK_SIGNATURE"
+  | "INVALID_WEBHOOK_PAYLOAD"
+  | "WEBHOOK_SECRET_MISSING";
 
 export class GitHubAppError extends Error {
   readonly code: GitHubErrorCode;

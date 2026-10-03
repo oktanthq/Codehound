@@ -12,6 +12,7 @@ export { createGitHubAppJwt } from "./jwt.js";
 export { mapGitHubRepository } from "./repository.js";
 export { InMemorySelectionStore } from "./selection.js";
 export { InstallationTokenClient } from "./tokens.js";
+export { BranchTracker, InMemoryRefStore, ZERO_SHA, mapGitHubCommit } from "./tracking.js";
 export { permissionSatisfies, parseRepositoryFullName } from "./types.js";
 
 export type { GitHubAppOptions } from "./app.js";
@@ -31,6 +32,14 @@ export type { Clock } from "./clock.js";
 export type { HttpClient, HttpRequest, HttpResponse } from "./http.js";
 export type { GitHubAppJwt } from "./jwt.js";
 export type { TokenMintOptions } from "./tokens.js";
+export type {
+  BranchSyncResult,
+  BranchTrackerOptions,
+  RecordedPush,
+  RefStore,
+  TrackedBranch,
+  TrackedCommit,
+} from "./tracking.js";
 export type {
   GitHubAppCredentials,
   Installation,
