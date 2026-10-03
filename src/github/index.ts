@@ -3,6 +3,9 @@ export { GitHubApp } from "./app.js";
 export { RepositoryAuthorizer } from "./authz.js";
 export { loadGitHubAppConfig, normalizePrivateKey } from "./config.js";
 export { RepositoryDiscovery } from "./discovery.js";
+export { authenticatedCloneUrl, ProcessGitCli } from "./git.js";
+export { defaultIngestRoot, RepositoryIngestor } from "./ingest.js";
+export { listIngestedFiles } from "./walk.js";
 export { GitHubAppError } from "./errors.js";
 export { createFetchHttpClient } from "./http.js";
 export { createGitHubAppJwt } from "./jwt.js";
@@ -18,6 +21,9 @@ export type {
   RepositoryDiscoveryOptions,
   RepositoryFilter,
 } from "./discovery.js";
+export type { GitCli, GitCloneRequest } from "./git.js";
+export type { IngestRequest, IngestSnapshot, RepositoryIngestorOptions } from "./ingest.js";
+export type { IngestedFile } from "./walk.js";
 export type { EnvMap } from "./config.js";
 export type { SelectionLookup, SelectionStore } from "./selection.js";
 export type { GitHubErrorCode } from "./errors.js";
