@@ -11,6 +11,7 @@ Work happens on the `dev` branch.
 - OKT-24 Implement repository cloning/ingestion
 - OKT-25 Implement branch and commit tracking
 - OKT-26 Implement GitHub webhook handling
+- OKT-27 Implement incremental code ingestion
 
 ## Partial
 
@@ -18,4 +19,6 @@ None.
 
 ## Next
 
-- OKT-27 Implement incremental code ingestion
+- OKT-28 Implement file and language detection
+- OKT-29 Implement repository/version metadata storage
+- OKT-31 Implement ingestion failure handling and retry mechanism

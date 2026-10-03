@@ -20,8 +20,7 @@ Postgres (or an equivalent store) and a vector index are planned once repository
 ```
 src/
   index.ts              public package exports
-  config/               environment and process configuration
-  github/               GitHub App, authz, discovery, ingest (OKT-21+)
+  github/               GitHub App credentials, JWT, authz, discovery, ingest (OKT-21+)
   analysis/             static analysis engine (OKT-32+)
   rag/                  chunking, embeddings, retrieval (OKT-44+)
   cim/                  project model / ontology (OKT-55+)
@@ -46,8 +45,11 @@ GitHub access is installation-based, not personal-access-token-based.
 4. **Authorization** checks that an installation can see a repository and holds the required permission rank (`read` < `write` < `admin`).
 5. **Discovery** lists installation repositories, with filters, and records which repos are selected for analysis.
 6. **Ingest** clones a selected, authorized repository into a local worktree and records a snapshot (ref, SHA, files) for later analysis.
+7. **Branch tracking** records branch heads and commits (from the GitHub API or from webhook payloads) and the last ingested SHA per branch.
+8. **Webhooks** verify `X-Hub-Signature-256`, parse GitHub events, and update branch tracking for push/delete.
+9. **Incremental ingest** fast-forwards an existing worktree when the new commit is a descendant of the last ingest; otherwise it reclones. Push webhooks drive this path.
 
-Later issues in this milestone add webhooks, incremental ingest, language detection, metadata storage, and retry.
+Later issues in this milestone add language detection, metadata storage, and retry.
 
 ## Design rules
 
