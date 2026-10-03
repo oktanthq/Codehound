@@ -5,6 +5,7 @@ export {
   GitHubApp,
   GitHubAppError,
   RepositoryAuthorizer,
+  RepositoryDiscovery,
   InMemorySelectionStore,
   loadGitHubAppConfig,
   createGitHubAppJwt,

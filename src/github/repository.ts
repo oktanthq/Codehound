@@ -15,6 +15,7 @@ type GitHubRepositoryPayload = {
   html_url: string;
   clone_url: string;
   size: number;
+  description?: string | null;
 };
 
 function visibilityFrom(payload: GitHubRepositoryPayload): RepositoryVisibility {

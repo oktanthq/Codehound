@@ -2,6 +2,7 @@ export { GitHubApi } from "./api.js";
 export { GitHubApp } from "./app.js";
 export { RepositoryAuthorizer } from "./authz.js";
 export { loadGitHubAppConfig, normalizePrivateKey } from "./config.js";
+export { RepositoryDiscovery } from "./discovery.js";
 export { GitHubAppError } from "./errors.js";
 export { createFetchHttpClient } from "./http.js";
 export { createGitHubAppJwt } from "./jwt.js";
@@ -12,6 +13,11 @@ export { permissionSatisfies, parseRepositoryFullName } from "./types.js";
 
 export type { GitHubAppOptions } from "./app.js";
 export type { AuthorizationDecision, AuthorizationRequest, AuthorizedAccess } from "./authz.js";
+export type {
+  DiscoveredRepository,
+  RepositoryDiscoveryOptions,
+  RepositoryFilter,
+} from "./discovery.js";
 export type { EnvMap } from "./config.js";
 export type { SelectionLookup, SelectionStore } from "./selection.js";
 export type { GitHubErrorCode } from "./errors.js";
