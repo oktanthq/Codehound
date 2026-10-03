@@ -4,6 +4,8 @@ export const version = "0.1.0";
 export {
   GitHubApp,
   GitHubAppError,
+  RepositoryAuthorizer,
+  InMemorySelectionStore,
   loadGitHubAppConfig,
   createGitHubAppJwt,
   InstallationTokenClient,
