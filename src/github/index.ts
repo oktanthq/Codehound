@@ -3,7 +3,8 @@ export { GitHubApp } from "./app.js";
 export { RepositoryAuthorizer } from "./authz.js";
 export { loadGitHubAppConfig, normalizePrivateKey } from "./config.js";
 export { RepositoryDiscovery } from "./discovery.js";
-export { authenticatedCloneUrl, ProcessGitCli } from "./git.js";
+export { authenticatedCloneUrl, isFetchingGitCli, ProcessGitCli } from "./git.js";
+export { IncrementalIngestor } from "./incremental.js";
 export { defaultIngestRoot, RepositoryIngestor } from "./ingest.js";
 export { listIngestedFiles } from "./walk.js";
 export { GitHubAppError } from "./errors.js";
@@ -29,7 +30,13 @@ export type {
   RepositoryDiscoveryOptions,
   RepositoryFilter,
 } from "./discovery.js";
-export type { GitCli, GitCloneRequest } from "./git.js";
+export type { FetchingGitCli, GitCli, GitCloneRequest, GitFetchRequest } from "./git.js";
+export type {
+  IncrementalAction,
+  IncrementalIngestorOptions,
+  IncrementalIngestResult,
+  WebhookIngestResult,
+} from "./incremental.js";
 export type { IngestRequest, IngestSnapshot, RepositoryIngestorOptions } from "./ingest.js";
 export type { IngestedFile } from "./walk.js";
 export type { EnvMap } from "./config.js";

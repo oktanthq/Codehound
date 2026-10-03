@@ -7,6 +7,7 @@ export {
   RepositoryAuthorizer,
   RepositoryDiscovery,
   RepositoryIngestor,
+  IncrementalIngestor,
   InMemorySelectionStore,
   BranchTracker,
   InMemoryRefStore,
