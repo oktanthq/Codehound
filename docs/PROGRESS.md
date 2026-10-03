@@ -9,6 +9,8 @@ Work happens on the `dev` branch.
 - OKT-22 Implement repository authentication and authorization
 - OKT-23 Implement repository discovery and selection
 - OKT-24 Implement repository cloning/ingestion
+- OKT-25 Implement branch and commit tracking
+- OKT-26 Implement GitHub webhook handling
 
 ## Partial
 
@@ -16,6 +18,4 @@ None.
 
 ## Next
 
-- OKT-25 Implement branch and commit tracking
-- OKT-26 Implement GitHub webhook handling
 - OKT-27 Implement incremental code ingestion

@@ -13,6 +13,13 @@ export { mapGitHubRepository } from "./repository.js";
 export { InMemorySelectionStore } from "./selection.js";
 export { InstallationTokenClient } from "./tokens.js";
 export { BranchTracker, InMemoryRefStore, ZERO_SHA, mapGitHubCommit } from "./tracking.js";
+export {
+  applyWebhookToTracker,
+  InMemoryDeliveryStore,
+  signGitHubPayload,
+  verifyGitHubSignature,
+  WebhookHandler,
+} from "./webhooks.js";
 export { permissionSatisfies, parseRepositoryFullName } from "./types.js";
 
 export type { GitHubAppOptions } from "./app.js";
@@ -40,6 +47,7 @@ export type {
   TrackedBranch,
   TrackedCommit,
 } from "./tracking.js";
+export type { DeliveryStore, ParsedWebhook, ParsedPush, WebhookHeaders } from "./webhooks.js";
 export type {
   GitHubAppCredentials,
   Installation,

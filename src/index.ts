@@ -10,6 +10,7 @@ export {
   InMemorySelectionStore,
   BranchTracker,
   InMemoryRefStore,
+  WebhookHandler,
   loadGitHubAppConfig,
   createGitHubAppJwt,
   InstallationTokenClient,
