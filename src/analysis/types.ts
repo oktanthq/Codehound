@@ -22,6 +22,7 @@ export type AnalysisSymbol = {
 
 export type AnalysisImport = {
   source: string;
+  kind: "import" | "export" | "require" | "dynamic";
 };
 
 export type AnalysisDocument = {
