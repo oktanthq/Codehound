@@ -23,4 +23,11 @@ export {
   InMemoryIngestJobStore,
 } from "./github/index.js";
 
-export { AdapterRegistry, AnalysisPipeline, analysisFilesFromIngest } from "./analysis/index.js";
+export {
+  AdapterRegistry,
+  AnalysisPipeline,
+  TypeScriptLanguageAdapter,
+  analysisFilesFromIngest,
+  createDefaultAnalysisPipeline,
+  loadAnalysisContents,
+} from "./analysis/index.js";

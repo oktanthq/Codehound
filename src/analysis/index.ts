@@ -1,8 +1,13 @@
 export { AdapterRegistry } from "./adapter.js";
+export { createDefaultAnalysisPipeline } from "./defaults.js";
 export { analysisFilesFromIngest } from "./from-ingest.js";
+export { loadAnalysisContents } from "./load.js";
+export { formatDiagnostics, parseTypeScript } from "./parse.js";
 export { AnalysisPipeline } from "./pipeline.js";
+export { TypeScriptLanguageAdapter } from "./typescript-adapter.js";
 
 export type { LanguageAdapter } from "./adapter.js";
+export type { ParsedSource } from "./parse.js";
 export type { AnalysisPipelineOptions } from "./pipeline.js";
 export type {
   AnalysisContext,

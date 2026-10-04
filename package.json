@@ -32,7 +32,8 @@
   ],
   "license": "UNLICENSED",
   "dependencies": {
-    "jose": "^6.2.13"
+    "jose": "^6.2.13",
+    "typescript": "^6.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
