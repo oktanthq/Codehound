@@ -7,6 +7,7 @@ import { systemClock, type Clock } from "./clock.js";
 import { GitHubAppError, redactSecrets } from "./errors.js";
 import { authenticatedCloneUrl, ProcessGitCli, type GitCli } from "./git.js";
 import { parseRepositoryFullName, type RepositoryRef } from "./types.js";
+import { fileInventory, type LanguageStat } from "./languages.js";
 import { listIngestedFiles, type IngestedFile } from "./walk.js";
 
 export type IngestRequest = {
@@ -27,6 +28,8 @@ export type IngestSnapshot = {
   worktreePath: string;
   fileCount: number;
   byteSize: number;
+  languages: LanguageStat[];
+  primaryLanguage: string | undefined;
   files: IngestedFile[];
 };
 
@@ -110,6 +113,7 @@ export class RepositoryIngestor {
     try {
       const commitSha = await this.git.revParse(destination, "HEAD");
       const files = await listIngestedFiles(destination);
+      const inventory = fileInventory(files);
       return {
         installationId: request.installationId,
         repository: access.repository,
@@ -117,8 +121,10 @@ export class RepositoryIngestor {
         commitSha,
         ingestedAt: this.clock.now().toISOString(),
         worktreePath: destination,
-        fileCount: files.length,
-        byteSize: files.reduce((sum, file) => sum + file.size, 0),
+        fileCount: inventory.fileCount,
+        byteSize: inventory.byteSize,
+        languages: inventory.languages,
+        primaryLanguage: inventory.primaryLanguage,
         files,
       };
     } catch (error) {

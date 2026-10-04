@@ -19,5 +19,22 @@ describe("listIngestedFiles", () => {
     const files = await listIngestedFiles(root);
     expect(files.map((file) => file.path)).toEqual(["README.md", "src/index.ts"]);
     expect(files[0]?.size).toBeGreaterThan(0);
+    expect(files[0]).toMatchObject({ language: "Markdown", kind: "docs" });
+    expect(files[1]).toMatchObject({ language: "TypeScript", kind: "source" });
+  });
+
+  it("detects language from a shebang when the file has no extension", async () => {
+    const root = await mkdtemp(join(tmpdir(), "codehound-walk-"));
+    await mkdir(join(root, "bin"), { recursive: true });
+    await writeFile(join(root, "bin", "run"), "#!/usr/bin/env python3\nprint(1)\n");
+
+    const files = await listIngestedFiles(root);
+    expect(files).toEqual([
+      expect.objectContaining({
+        path: "bin/run",
+        language: "Python",
+        kind: "source",
+      }),
+    ]);
   });
 });

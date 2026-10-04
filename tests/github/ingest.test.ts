@@ -108,6 +108,8 @@ describe("RepositoryIngestor", () => {
     expect(snapshot.files.map((file) => file.path)).toEqual(["README.md", "src/index.ts"]);
     expect(snapshot.fileCount).toBe(2);
     expect(snapshot.byteSize).toBeGreaterThan(0);
+    expect(snapshot.primaryLanguage).toBe("TypeScript");
+    expect(snapshot.files[1]).toMatchObject({ language: "TypeScript", kind: "source" });
     expect(snapshot.repository.fullName).toBe("oktant/demo");
   });
 

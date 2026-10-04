@@ -1,9 +1,12 @@
-import { readdir, stat } from "node:fs/promises";
+import { open, readdir, stat, type FileHandle } from "node:fs/promises";
 import { join, relative } from "node:path";
+import { detectFile, type FileKind } from "./languages.js";
 
 export type IngestedFile = {
   path: string;
   size: number;
+  language: string | undefined;
+  kind: FileKind;
 };
 
 const IGNORE_DIRECTORIES = new Set([
@@ -65,6 +68,24 @@ function extensionOf(name: string): string {
   return name.slice(index).toLowerCase();
 }
 
+async function readPrefix(fullPath: string, length = 256): Promise<string | undefined> {
+  let handle: FileHandle | undefined;
+  try {
+    handle = await open(fullPath, "r");
+    const buffer = Buffer.alloc(length);
+    const result = await handle.read(buffer, 0, length, 0);
+    const slice = buffer.subarray(0, result.bytesRead);
+    if (slice.includes(0)) {
+      return undefined;
+    }
+    return slice.toString("utf8");
+  } catch {
+    return undefined;
+  } finally {
+    await handle?.close();
+  }
+}
+
 export async function listIngestedFiles(root: string): Promise<IngestedFile[]> {
   const files: IngestedFile[] = [];
 
@@ -86,9 +107,15 @@ export async function listIngestedFiles(root: string): Promise<IngestedFile[]> {
         continue;
       }
       const info = await stat(fullPath);
+      const path = relative(root, fullPath).replaceAll("\\", "/");
+      const fromPath = detectFile(path, undefined);
+      const prefix = fromPath.language === undefined ? await readPrefix(fullPath) : undefined;
+      const detected = detectFile(path, prefix);
       files.push({
-        path: relative(root, fullPath).replaceAll("\\", "/"),
+        path,
         size: info.size,
+        language: detected.language,
+        kind: detected.kind,
       });
     }
   }

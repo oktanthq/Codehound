@@ -15,4 +15,6 @@ export {
   loadGitHubAppConfig,
   createGitHubAppJwt,
   InstallationTokenClient,
+  detectFile,
+  summarizeLanguages,
 } from "./github/index.js";

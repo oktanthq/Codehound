@@ -20,6 +20,7 @@ import {
 } from "./ingest.js";
 import type { BranchTracker } from "./tracking.js";
 import { parseRepositoryFullName } from "./types.js";
+import { fileInventory } from "./languages.js";
 import { listIngestedFiles } from "./walk.js";
 import { applyWebhookToTracker, type ParsedWebhook } from "./webhooks.js";
 
@@ -261,6 +262,7 @@ export class IncrementalIngestor {
     commitSha: string;
   }): Promise<IngestSnapshot> {
     const files = await listIngestedFiles(input.destination);
+    const inventory = fileInventory(files);
     return {
       installationId: input.request.installationId,
       repository: input.accessRepository,
@@ -268,8 +270,10 @@ export class IncrementalIngestor {
       commitSha: input.commitSha,
       ingestedAt: this.clock.now().toISOString(),
       worktreePath: input.destination,
-      fileCount: files.length,
-      byteSize: files.reduce((sum, file) => sum + file.size, 0),
+      fileCount: inventory.fileCount,
+      byteSize: inventory.byteSize,
+      languages: inventory.languages,
+      primaryLanguage: inventory.primaryLanguage,
       files,
     };
   }
