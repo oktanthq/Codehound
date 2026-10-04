@@ -18,4 +18,7 @@ export {
   detectFile,
   summarizeLanguages,
   InMemoryMetadataStore,
+  RetryingIngestor,
+  RetryingIncrementalIngestor,
+  InMemoryIngestJobStore,
 } from "./github/index.js";

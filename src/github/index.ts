@@ -6,12 +6,18 @@ export { RepositoryDiscovery } from "./discovery.js";
 export { authenticatedCloneUrl, isFetchingGitCli, ProcessGitCli } from "./git.js";
 export { IncrementalIngestor } from "./incremental.js";
 export { defaultIngestRoot, RepositoryIngestor } from "./ingest.js";
-export { detectFile, fileInventory, summarizeLanguages } from "./languages.js";
 export {
-  InMemoryMetadataStore,
-  snapshotToRepository,
-  snapshotToVersion,
-} from "./metadata.js";
+  DEFAULT_RETRY_POLICY,
+  InMemoryIngestJobStore,
+  RetryingIncrementalIngestor,
+  RetryingIngestor,
+  delayForAttempt,
+  ingestJobId,
+  isRetryableIngestError,
+  runWithRetry,
+} from "./retry.js";
+export { detectFile, fileInventory, summarizeLanguages } from "./languages.js";
+export { InMemoryMetadataStore, snapshotToRepository, snapshotToVersion } from "./metadata.js";
 export { listIngestedFiles } from "./walk.js";
 export { GitHubAppError } from "./errors.js";
 export { createFetchHttpClient } from "./http.js";
@@ -44,13 +50,19 @@ export type {
   WebhookIngestResult,
 } from "./incremental.js";
 export type { IngestRequest, IngestSnapshot, RepositoryIngestorOptions } from "./ingest.js";
-export type { DetectedFile, FileKind, LanguageStat, LanguageSummary } from "./languages.js";
 export type {
-  IngestRecord,
-  MetadataStore,
-  StoredRepository,
-  StoredVersion,
-} from "./metadata.js";
+  IngestJob,
+  IngestJobAttempt,
+  IngestJobStatus,
+  IngestJobStore,
+  RetryContext,
+  RetryPolicy,
+  RetryingIngestorOptions,
+  RunWithRetryOptions,
+  Sleeper,
+} from "./retry.js";
+export type { DetectedFile, FileKind, LanguageStat, LanguageSummary } from "./languages.js";
+export type { IngestRecord, MetadataStore, StoredRepository, StoredVersion } from "./metadata.js";
 export type { IngestedFile } from "./walk.js";
 export type { EnvMap } from "./config.js";
 export type { SelectionLookup, SelectionStore } from "./selection.js";
