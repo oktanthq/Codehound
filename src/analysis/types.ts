@@ -25,12 +25,19 @@ export type AnalysisImport = {
   kind: "import" | "export" | "require" | "dynamic";
 };
 
+export type CallEdge = {
+  from: string;
+  to: string;
+  startLine: number;
+};
+
 export type AnalysisDocument = {
   path: string;
   language: string;
   adapterId: string;
   symbols: AnalysisSymbol[];
   imports: AnalysisImport[];
+  calls: CallEdge[];
 };
 
 export type SkipReason =

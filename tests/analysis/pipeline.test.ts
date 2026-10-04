@@ -21,6 +21,7 @@ function typescriptAdapter(): LanguageAdapter {
         adapterId: "typescript",
         symbols: [{ name: "placeholder", kind: "file", startLine: 1, endLine: 1 }],
         imports: [],
+        calls: [],
       };
     },
   };
@@ -44,6 +45,7 @@ describe("AnalysisPipeline", () => {
         adapterId: "typescript",
         symbols: [{ name: "placeholder", kind: "file", startLine: 1, endLine: 1 }],
         imports: [],
+        calls: [],
       },
     ]);
     expect(run.skipped).toEqual([

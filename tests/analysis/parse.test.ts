@@ -92,6 +92,7 @@ describe("createDefaultAnalysisPipeline", () => {
         adapterId: "typescript",
         symbols: [{ name: "run", kind: "function", startLine: 1, endLine: 1 }],
         imports: [],
+        calls: [],
       },
     ]);
     expect(run.skipped.map((item) => item.path)).toEqual(["README.md"]);
