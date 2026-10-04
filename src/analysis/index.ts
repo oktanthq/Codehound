@@ -6,6 +6,7 @@ export { formatDiagnostics, parseTypeScript } from "./parse.js";
 export { AnalysisPipeline } from "./pipeline.js";
 export { extractCalls } from "./calls.js";
 export { extractImports } from "./imports.js";
+export { extractRelations } from "./relations.js";
 export { extractSymbols } from "./symbols.js";
 export { TypeScriptLanguageAdapter } from "./typescript-adapter.js";
 
@@ -20,6 +21,7 @@ export type {
   AnalysisRun,
   AnalysisSymbol,
   CallEdge,
+  TypeRelation,
   SkipReason,
   SkippedFile,
 } from "./types.js";

@@ -2,6 +2,7 @@ import type { LanguageAdapter } from "./adapter.js";
 import { formatDiagnostics, parseTypeScript } from "./parse.js";
 import { extractCalls } from "./calls.js";
 import { extractImports } from "./imports.js";
+import { extractRelations } from "./relations.js";
 import { extractSymbols } from "./symbols.js";
 import type { AnalysisContext, AnalysisDocument, AnalysisFile } from "./types.js";
 
@@ -25,6 +26,7 @@ export class TypeScriptLanguageAdapter implements LanguageAdapter {
       symbols: extractSymbols(parsed.sourceFile),
       imports: extractImports(parsed.sourceFile),
       calls: extractCalls(parsed.sourceFile),
+      relations: extractRelations(parsed.sourceFile),
     };
   }
 }

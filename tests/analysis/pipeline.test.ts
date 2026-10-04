@@ -22,6 +22,7 @@ function typescriptAdapter(): LanguageAdapter {
         symbols: [{ name: "placeholder", kind: "file", startLine: 1, endLine: 1 }],
         imports: [],
         calls: [],
+        relations: [],
       };
     },
   };
@@ -46,6 +47,7 @@ describe("AnalysisPipeline", () => {
         symbols: [{ name: "placeholder", kind: "file", startLine: 1, endLine: 1 }],
         imports: [],
         calls: [],
+        relations: [],
       },
     ]);
     expect(run.skipped).toEqual([

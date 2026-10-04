@@ -31,6 +31,12 @@ export type CallEdge = {
   startLine: number;
 };
 
+export type TypeRelation = {
+  from: string;
+  kind: "extends" | "implements" | "alias";
+  to: string;
+};
+
 export type AnalysisDocument = {
   path: string;
   language: string;
@@ -38,6 +44,7 @@ export type AnalysisDocument = {
   symbols: AnalysisSymbol[];
   imports: AnalysisImport[];
   calls: CallEdge[];
+  relations: TypeRelation[];
 };
 
 export type SkipReason =

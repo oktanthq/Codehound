@@ -93,6 +93,7 @@ describe("createDefaultAnalysisPipeline", () => {
         symbols: [{ name: "run", kind: "function", startLine: 1, endLine: 1 }],
         imports: [],
         calls: [],
+        relations: [],
       },
     ]);
     expect(run.skipped.map((item) => item.path)).toEqual(["README.md"]);
