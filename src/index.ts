@@ -22,3 +22,5 @@ export {
   RetryingIncrementalIngestor,
   InMemoryIngestJobStore,
 } from "./github/index.js";
+
+export { AdapterRegistry, AnalysisPipeline, analysisFilesFromIngest } from "./analysis/index.js";

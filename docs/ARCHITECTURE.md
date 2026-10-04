@@ -33,7 +33,7 @@ docs/                   architecture and progress
 .github/workflows/      CI
 ```
 
-Modules that are not implemented yet are omitted from `src/` until their issues land. Callers should import from `src/github` (or the package root) rather than reaching around GitHub HTTP details.
+Modules that are not implemented yet are omitted from `src/` until their issues land. Callers should import from `src/github` or `src/analysis` (or the package root) rather than reaching around GitHub HTTP or parser details.
 
 ## GitHub Integration
 
@@ -48,8 +48,20 @@ GitHub access is installation-based, not personal-access-token-based.
 7. **Branch tracking** records branch heads and commits (from the GitHub API or from webhook payloads) and the last ingested SHA per branch.
 8. **Webhooks** verify `X-Hub-Signature-256`, parse GitHub events, and update branch tracking for push/delete.
 9. **Incremental ingest** fast-forwards an existing worktree when the new commit is a descendant of the last ingest; otherwise it reclones. Push webhooks drive this path.
+10. **Language detection** classifies each ingested file (extension, filename, shebang) and records a language inventory plus a primary language.
+11. **Metadata storage** keeps repository and per-commit version records (languages, files, SHAs) behind a store interface; the in-memory implementation is for tests and early local use.
+12. **Retry** wraps clone/ingest with exponential backoff, skips non-retryable authorization errors, and records per-attempt job status.
 
-Later issues in this milestone add language detection, metadata storage, and retry.
+## Code Analysis Engine
+
+Analysis is language-agnostic at the pipeline layer. GitHub ingest produces a file list with detected languages; the analysis engine does not parse GitHub HTTP itself.
+
+1. **Adapters** implement `LanguageAdapter` for one or more languages and emit a shared document shape (`symbols`, `imports`). Parsing, call graphs, and types land in later issues as richer fields on that document, not as per-language pipelines.
+2. **Registry** maps a detected language name to the first registered adapter. Unknown or undetected languages are skipped, not fatal.
+3. **Pipeline** walks an ingest file list, dispatches each file, and isolates adapter failures so one file cannot abort the run.
+4. **Results** are `AnalysisDocument` values plus a skip list. Persistent analysis storage is a later issue.
+
+Callers should import from `src/analysis` (or the package root) rather than constructing language-specific parsers ad hoc.
 
 ## Design rules
 
