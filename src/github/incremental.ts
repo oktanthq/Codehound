@@ -78,6 +78,7 @@ export class IncrementalIngestor {
   private readonly requireSelected: boolean;
   private readonly ingestor: RepositoryIngestor;
   private readonly tracker: BranchTracker;
+  private readonly metadata: IncrementalIngestorOptions["metadata"];
 
   constructor(
     private readonly app: GitHubApp,
@@ -89,12 +90,17 @@ export class IncrementalIngestor {
     this.clock = options.clock ?? systemClock;
     this.rootDir = options.rootDir ?? defaultIngestRoot();
     this.requireSelected = options.requireSelected ?? true;
-    this.ingestor = new RepositoryIngestor(app, authorizer, {
+    this.metadata = options.metadata;
+    const ingestorOptions: RepositoryIngestorOptions = {
       rootDir: this.rootDir,
       git: this.git,
       clock: this.clock,
       requireSelected: this.requireSelected,
-    });
+    };
+    if (options.metadata !== undefined) {
+      ingestorOptions.metadata = options.metadata;
+    }
+    this.ingestor = new RepositoryIngestor(app, authorizer, ingestorOptions);
   }
 
   async ingest(
@@ -263,7 +269,7 @@ export class IncrementalIngestor {
   }): Promise<IngestSnapshot> {
     const files = await listIngestedFiles(input.destination);
     const inventory = fileInventory(files);
-    return {
+    const snapshot: IngestSnapshot = {
       installationId: input.request.installationId,
       repository: input.accessRepository,
       ref: input.ref,
@@ -276,5 +282,9 @@ export class IncrementalIngestor {
       primaryLanguage: inventory.primaryLanguage,
       files,
     };
+    if (this.metadata !== undefined) {
+      await this.metadata.saveIngest(snapshot);
+    }
+    return snapshot;
   }
 }

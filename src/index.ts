@@ -17,4 +17,5 @@ export {
   InstallationTokenClient,
   detectFile,
   summarizeLanguages,
+  InMemoryMetadataStore,
 } from "./github/index.js";

@@ -8,6 +8,7 @@ import { GitHubAppError, redactSecrets } from "./errors.js";
 import { authenticatedCloneUrl, ProcessGitCli, type GitCli } from "./git.js";
 import { parseRepositoryFullName, type RepositoryRef } from "./types.js";
 import { fileInventory, type LanguageStat } from "./languages.js";
+import type { MetadataStore } from "./metadata.js";
 import { listIngestedFiles, type IngestedFile } from "./walk.js";
 
 export type IngestRequest = {
@@ -38,6 +39,7 @@ export type RepositoryIngestorOptions = {
   git?: GitCli;
   clock?: Clock;
   requireSelected?: boolean;
+  metadata?: MetadataStore;
 };
 
 function resolveNames(request: IngestRequest): { owner: string; name: string } {
@@ -63,6 +65,7 @@ export class RepositoryIngestor {
   private readonly clock: Clock;
   private readonly rootDir: string;
   private readonly requireSelected: boolean;
+  private readonly metadata: MetadataStore | undefined;
 
   constructor(
     private readonly app: GitHubApp,
@@ -73,6 +76,7 @@ export class RepositoryIngestor {
     this.clock = options.clock ?? systemClock;
     this.rootDir = options.rootDir ?? defaultIngestRoot();
     this.requireSelected = options.requireSelected ?? true;
+    this.metadata = options.metadata;
   }
 
   async ingest(request: IngestRequest): Promise<IngestSnapshot> {
@@ -114,7 +118,7 @@ export class RepositoryIngestor {
       const commitSha = await this.git.revParse(destination, "HEAD");
       const files = await listIngestedFiles(destination);
       const inventory = fileInventory(files);
-      return {
+      const snapshot: IngestSnapshot = {
         installationId: request.installationId,
         repository: access.repository,
         ref,
@@ -127,6 +131,10 @@ export class RepositoryIngestor {
         primaryLanguage: inventory.primaryLanguage,
         files,
       };
+      if (this.metadata !== undefined) {
+        await this.metadata.saveIngest(snapshot);
+      }
+      return snapshot;
     } catch (error) {
       const message = error instanceof Error ? error.message : "ingest failed";
       throw new GitHubAppError(redactSecrets(message, secrets), "INGEST_FAILED");

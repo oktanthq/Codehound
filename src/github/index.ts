@@ -7,6 +7,11 @@ export { authenticatedCloneUrl, isFetchingGitCli, ProcessGitCli } from "./git.js
 export { IncrementalIngestor } from "./incremental.js";
 export { defaultIngestRoot, RepositoryIngestor } from "./ingest.js";
 export { detectFile, fileInventory, summarizeLanguages } from "./languages.js";
+export {
+  InMemoryMetadataStore,
+  snapshotToRepository,
+  snapshotToVersion,
+} from "./metadata.js";
 export { listIngestedFiles } from "./walk.js";
 export { GitHubAppError } from "./errors.js";
 export { createFetchHttpClient } from "./http.js";
@@ -40,6 +45,12 @@ export type {
 } from "./incremental.js";
 export type { IngestRequest, IngestSnapshot, RepositoryIngestorOptions } from "./ingest.js";
 export type { DetectedFile, FileKind, LanguageStat, LanguageSummary } from "./languages.js";
+export type {
+  IngestRecord,
+  MetadataStore,
+  StoredRepository,
+  StoredVersion,
+} from "./metadata.js";
 export type { IngestedFile } from "./walk.js";
 export type { EnvMap } from "./config.js";
 export type { SelectionLookup, SelectionStore } from "./selection.js";
