@@ -1,5 +1,6 @@
 import type { LanguageAdapter } from "./adapter.js";
 import { formatDiagnostics, parseTypeScript } from "./parse.js";
+import { extractSymbols } from "./symbols.js";
 import type { AnalysisContext, AnalysisDocument, AnalysisFile } from "./types.js";
 
 export class TypeScriptLanguageAdapter implements LanguageAdapter {
@@ -19,7 +20,7 @@ export class TypeScriptLanguageAdapter implements LanguageAdapter {
       path: file.path,
       language,
       adapterId: this.id,
-      symbols: [],
+      symbols: extractSymbols(parsed.sourceFile),
       imports: [],
     };
   }

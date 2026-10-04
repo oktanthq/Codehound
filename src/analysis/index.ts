@@ -4,6 +4,7 @@ export { analysisFilesFromIngest } from "./from-ingest.js";
 export { loadAnalysisContents } from "./load.js";
 export { formatDiagnostics, parseTypeScript } from "./parse.js";
 export { AnalysisPipeline } from "./pipeline.js";
+export { extractSymbols } from "./symbols.js";
 export { TypeScriptLanguageAdapter } from "./typescript-adapter.js";
 
 export type { LanguageAdapter } from "./adapter.js";

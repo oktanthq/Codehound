@@ -53,7 +53,7 @@ describe("TypeScriptLanguageAdapter", () => {
       context,
     );
     expect(tsDoc.adapterId).toBe("typescript");
-    expect(tsDoc.symbols).toEqual([]);
+    expect(tsDoc.symbols).toEqual([{ name: "n", kind: "variable", startLine: 1, endLine: 1 }]);
     expect(jsDoc.language).toBe("JavaScript");
   });
 
@@ -90,7 +90,7 @@ describe("createDefaultAnalysisPipeline", () => {
         path: "src/index.ts",
         language: "TypeScript",
         adapterId: "typescript",
-        symbols: [],
+        symbols: [{ name: "run", kind: "function", startLine: 1, endLine: 1 }],
         imports: [],
       },
     ]);
