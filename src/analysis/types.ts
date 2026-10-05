@@ -44,6 +44,13 @@ export type ApiEndpoint = {
   startLine: number;
 };
 
+export type DataFlowEdge = {
+  from: string;
+  to: string;
+  kind: "assign" | "return" | "argument";
+  startLine: number;
+};
+
 export type AnalysisDocument = {
   path: string;
   language: string;
@@ -53,6 +60,7 @@ export type AnalysisDocument = {
   calls: CallEdge[];
   relations: TypeRelation[];
   endpoints: ApiEndpoint[];
+  dataFlows: DataFlowEdge[];
 };
 
 export type SkipReason =

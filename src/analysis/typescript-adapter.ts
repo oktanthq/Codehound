@@ -1,6 +1,7 @@
 import type { LanguageAdapter } from "./adapter.js";
 import { formatDiagnostics, parseTypeScript } from "./parse.js";
 import { extractCalls } from "./calls.js";
+import { extractDataFlows } from "./dataflow.js";
 import { extractEndpoints } from "./endpoints.js";
 import { extractImports } from "./imports.js";
 import { extractRelations } from "./relations.js";
@@ -29,6 +30,7 @@ export class TypeScriptLanguageAdapter implements LanguageAdapter {
       calls: extractCalls(parsed.sourceFile),
       relations: extractRelations(parsed.sourceFile),
       endpoints: extractEndpoints(parsed.sourceFile),
+      dataFlows: extractDataFlows(parsed.sourceFile),
     };
   }
 }
