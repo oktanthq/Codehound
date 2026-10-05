@@ -94,6 +94,7 @@ describe("createDefaultAnalysisPipeline", () => {
         imports: [],
         calls: [],
         relations: [],
+        endpoints: [],
       },
     ]);
     expect(run.skipped.map((item) => item.path)).toEqual(["README.md"]);

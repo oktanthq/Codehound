@@ -37,6 +37,13 @@ export type TypeRelation = {
   to: string;
 };
 
+export type ApiEndpoint = {
+  method: string;
+  path: string;
+  handler: string | undefined;
+  startLine: number;
+};
+
 export type AnalysisDocument = {
   path: string;
   language: string;
@@ -45,6 +52,7 @@ export type AnalysisDocument = {
   imports: AnalysisImport[];
   calls: CallEdge[];
   relations: TypeRelation[];
+  endpoints: ApiEndpoint[];
 };
 
 export type SkipReason =

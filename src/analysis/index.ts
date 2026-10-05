@@ -5,6 +5,7 @@ export { loadAnalysisContents } from "./load.js";
 export { formatDiagnostics, parseTypeScript } from "./parse.js";
 export { AnalysisPipeline } from "./pipeline.js";
 export { extractCalls } from "./calls.js";
+export { extractEndpoints } from "./endpoints.js";
 export { extractImports } from "./imports.js";
 export { extractRelations } from "./relations.js";
 export { extractSymbols } from "./symbols.js";
@@ -20,6 +21,7 @@ export type {
   AnalysisImport,
   AnalysisRun,
   AnalysisSymbol,
+  ApiEndpoint,
   CallEdge,
   TypeRelation,
   SkipReason,
