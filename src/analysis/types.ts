@@ -51,6 +51,19 @@ export type DataFlowEdge = {
   startLine: number;
 };
 
+export type DetectedComponent = {
+  name: string;
+  kind: "module" | "component" | "controller" | "service";
+  path: string;
+};
+
+export type CrossFileLink = {
+  fromPath: string;
+  toPath: string;
+  kind: "import";
+  specifier: string;
+};
+
 export type AnalysisDocument = {
   path: string;
   language: string;
@@ -61,6 +74,7 @@ export type AnalysisDocument = {
   relations: TypeRelation[];
   endpoints: ApiEndpoint[];
   dataFlows: DataFlowEdge[];
+  components: DetectedComponent[];
 };
 
 export type SkipReason =

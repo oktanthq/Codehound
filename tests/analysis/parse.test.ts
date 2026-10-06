@@ -96,6 +96,7 @@ describe("createDefaultAnalysisPipeline", () => {
         relations: [],
         endpoints: [],
         dataFlows: [],
+        components: [{ name: "index", kind: "module", path: "src/index.ts" }],
       },
     ]);
     expect(run.skipped.map((item) => item.path)).toEqual(["README.md"]);

@@ -25,6 +25,7 @@ function typescriptAdapter(): LanguageAdapter {
         relations: [],
         endpoints: [],
         dataFlows: [],
+        components: [],
       };
     },
   };
@@ -52,6 +53,7 @@ describe("AnalysisPipeline", () => {
         relations: [],
         endpoints: [],
         dataFlows: [],
+        components: [],
       },
     ]);
     expect(run.skipped).toEqual([
