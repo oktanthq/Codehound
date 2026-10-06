@@ -9,6 +9,7 @@ export { extractComponents } from "./components.js";
 export { extractDataFlows } from "./dataflow.js";
 export { extractEndpoints } from "./endpoints.js";
 export { extractImports } from "./imports.js";
+export { linkDocuments } from "./links.js";
 export { extractRelations } from "./relations.js";
 export { extractSymbols } from "./symbols.js";
 export { TypeScriptLanguageAdapter } from "./typescript-adapter.js";

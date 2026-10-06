@@ -1,5 +1,6 @@
 import type { LanguageAdapter } from "./adapter.js";
 import { AdapterRegistry } from "./adapter.js";
+import { linkDocuments } from "./links.js";
 import type {
   AnalysisContext,
   AnalysisDocument,
@@ -61,6 +62,6 @@ export class AnalysisPipeline {
       }
     }
 
-    return { context, documents, skipped };
+    return { context, documents, skipped, links: linkDocuments(documents) };
   }
 }

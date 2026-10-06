@@ -91,4 +91,5 @@ export type AnalysisRun = {
   context: AnalysisContext;
   documents: AnalysisDocument[];
   skipped: SkippedFile[];
+  links: CrossFileLink[];
 };
