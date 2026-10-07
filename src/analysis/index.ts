@@ -4,6 +4,7 @@ export { analysisFilesFromIngest } from "./from-ingest.js";
 export { loadAnalysisContents } from "./load.js";
 export { formatDiagnostics, parseTypeScript } from "./parse.js";
 export { AnalysisPipeline } from "./pipeline.js";
+export { InMemoryAnalysisStore } from "./store.js";
 export { extractCalls } from "./calls.js";
 export { extractComponents } from "./components.js";
 export { extractDataFlows } from "./dataflow.js";
@@ -17,6 +18,7 @@ export { TypeScriptLanguageAdapter } from "./typescript-adapter.js";
 export type { LanguageAdapter } from "./adapter.js";
 export type { ParsedSource } from "./parse.js";
 export type { AnalysisPipelineOptions } from "./pipeline.js";
+export type { AnalysisStore, StoredAnalysis } from "./store.js";
 export type {
   AnalysisContext,
   AnalysisDocument,

@@ -26,6 +26,7 @@ export {
 export {
   AdapterRegistry,
   AnalysisPipeline,
+  InMemoryAnalysisStore,
   TypeScriptLanguageAdapter,
   analysisFilesFromIngest,
   createDefaultAnalysisPipeline,
