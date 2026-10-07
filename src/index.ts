@@ -31,4 +31,7 @@ export {
   analysisFilesFromIngest,
   createDefaultAnalysisPipeline,
   loadAnalysisContents,
+  detectFrameworks,
+  isTargetLanguage,
+  TARGET_LANGUAGES,
 } from "./analysis/index.js";

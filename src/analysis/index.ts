@@ -13,12 +13,14 @@ export { extractImports } from "./imports.js";
 export { linkDocuments } from "./links.js";
 export { extractRelations } from "./relations.js";
 export { extractSymbols } from "./symbols.js";
+export { detectFrameworks, isTargetLanguage, TARGET_LANGUAGES } from "./targets.js";
 export { TypeScriptLanguageAdapter } from "./typescript-adapter.js";
 
 export type { LanguageAdapter } from "./adapter.js";
 export type { ParsedSource } from "./parse.js";
 export type { AnalysisPipelineOptions } from "./pipeline.js";
 export type { AnalysisStore, StoredAnalysis } from "./store.js";
+export type { DetectedFramework, TargetLanguage } from "./targets.js";
 export type {
   AnalysisContext,
   AnalysisDocument,
