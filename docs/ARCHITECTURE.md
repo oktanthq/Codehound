@@ -56,10 +56,10 @@ GitHub access is installation-based, not personal-access-token-based.
 
 Analysis is language-agnostic at the pipeline layer. GitHub ingest produces a file list with detected languages; the analysis engine does not parse GitHub HTTP itself.
 
-1. **Adapters** implement `LanguageAdapter` for one or more languages and emit a shared document shape (`symbols`, `imports`). The TypeScript adapter parses TypeScript and JavaScript with the compiler API (syntactic diagnostics, then a source-file AST), then walks that tree for declarations and module specifiers. Call graphs and types land in later issues as richer fields on that document, not as per-language pipelines.
-2. **Registry** maps a detected language name to the first registered adapter. Unknown or undetected languages are skipped, not fatal.
-3. **Pipeline** walks an ingest file list, dispatches each file, and isolates adapter failures so one file cannot abort the run.
-4. **Results** are `AnalysisDocument` values plus a skip list. Persistent analysis storage is a later issue.
+1. **Adapters** implement `LanguageAdapter` for one or more languages and emit a shared document shape (`symbols`, `imports`, `calls`, `relations`, `endpoints`, `dataFlows`, `components`). The TypeScript adapter parses TypeScript and JavaScript with the compiler API (syntactic diagnostics, then a source-file AST), then walks that tree for declarations, module specifiers, calls, heritage, HTTP routes, and local data flow.
+2. **Registry** maps a detected language name to the first registered adapter. Unknown or undetected languages are skipped, not fatal. The initial targets are TypeScript and JavaScript, with framework hints for React, Express, and Nest.
+3. **Pipeline** walks an ingest file list, dispatches each file, isolates adapter failures so one file cannot abort the run, and resolves relative imports into cross-file links.
+4. **Results** are `AnalysisDocument` values plus a skip list and import links. `InMemoryAnalysisStore` keeps runs by repository and commit SHA.
 
 Callers should import from `src/analysis` (or the package root) rather than constructing language-specific parsers ad hoc.
 
