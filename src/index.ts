@@ -36,4 +36,4 @@ export {
   TARGET_LANGUAGES,
 } from "./analysis/index.js";
 
-export { chunkDocument, chunkSource } from "./rag/index.js";
+export { chunkDocument, chunkSource, EmbeddingPipeline, HashingEmbedder } from "./rag/index.js";
