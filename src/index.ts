@@ -35,3 +35,5 @@ export {
   isTargetLanguage,
   TARGET_LANGUAGES,
 } from "./analysis/index.js";
+
+export { chunkDocument, chunkSource } from "./rag/index.js";
