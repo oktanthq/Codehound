@@ -41,5 +41,8 @@ export {
   chunkSource,
   EmbeddingPipeline,
   HashingEmbedder,
+  HybridRetriever,
   InMemoryVectorStore,
+  KeywordIndex,
+  SemanticSearcher,
 } from "./rag/index.js";

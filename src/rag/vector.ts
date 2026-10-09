@@ -1,5 +1,5 @@
 import { cosineSimilarity } from "./embed.js";
-import type { ChunkKind, EmbeddedChunk, RetrievalHit } from "./types.js";
+import type { ChunkKind, CodeChunk, EmbeddedChunk, RetrievalHit, RetrievalQuery } from "./types.js";
 
 export type VectorFilter = {
   repositoryFullName?: string;
@@ -25,7 +25,33 @@ export type VectorStore = {
   ) => Promise<RetrievalHit[]>;
 };
 
-function matchesFilter(chunk: EmbeddedChunk, filter: VectorFilter | undefined): boolean {
+export function filterFromQuery(query: RetrievalQuery): VectorFilter {
+  const filter: VectorFilter = {};
+  if (query.repositoryFullName !== undefined) {
+    filter.repositoryFullName = query.repositoryFullName;
+  }
+  if (query.commitSha !== undefined) {
+    filter.commitSha = query.commitSha;
+  }
+  if (query.language !== undefined) {
+    filter.language = query.language;
+  }
+  if (query.pathPrefix !== undefined) {
+    filter.pathPrefix = query.pathPrefix;
+  }
+  if (query.symbol !== undefined) {
+    filter.symbol = query.symbol;
+  }
+  if (query.symbolKind !== undefined) {
+    filter.symbolKind = query.symbolKind;
+  }
+  if (query.chunkKind !== undefined) {
+    filter.chunkKind = query.chunkKind;
+  }
+  return filter;
+}
+
+export function matchesFilter(chunk: CodeChunk, filter: VectorFilter | undefined): boolean {
   if (filter === undefined) {
     return true;
   }
@@ -124,5 +150,3 @@ export class InMemoryVectorStore implements VectorStore {
     return hits.slice(0, Math.max(0, limit));
   }
 }
-
-export { matchesFilter };
