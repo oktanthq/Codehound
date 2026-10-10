@@ -43,6 +43,11 @@ export {
   HashingEmbedder,
   HybridRetriever,
   InMemoryVectorStore,
+  IncrementalIndexer,
   KeywordIndex,
   SemanticSearcher,
+  SymbolAwareRetriever,
+  FilteringRetriever,
+  RerankingRetriever,
+  evaluateRetriever,
 } from "./rag/index.js";

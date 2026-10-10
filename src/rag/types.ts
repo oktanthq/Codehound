@@ -53,3 +53,7 @@ export type RetrievalQuery = {
   chunkKind?: ChunkKind;
   limit?: number;
 };
+
+export type Retriever = {
+  search: (query: RetrievalQuery) => Promise<RetrievalHit[]>;
+};
