@@ -1,8 +1,7 @@
 import type { AnalysisDocument, AnalysisRun } from "../analysis/types.js";
 import { entityId, relationId, type CodeIntelligenceModel } from "./model.js";
+import { isRuleName } from "./rules.js";
 import type { CimEntity } from "./types.js";
-
-const RULE_NAME = /^(validate|assert|ensure|check|guard)/i;
 
 function contextOf(run: AnalysisRun): { repositoryFullName: string; commitSha: string } {
   return {
@@ -27,7 +26,7 @@ function fileEntity(
   };
 }
 
-function layerForPath(path: string): string {
+export function layerForPath(path: string): string {
   if (path.startsWith("tests/") || path.includes("/__tests__/")) {
     return "test";
   }
@@ -70,6 +69,8 @@ export function ingestAnalysisRun(model: CodeIntelligenceModel, run: AnalysisRun
   });
 
   const fileIds = new Map<string, string>();
+  const componentsByPath = new Map<string, string[]>();
+  const layersByPath = new Map<string, string>();
   for (const document of run.documents) {
     const file = fileEntity(document, repositoryFullName, commitSha);
     model.upsertEntity(file);
@@ -83,6 +84,7 @@ export function ingestAnalysisRun(model: CodeIntelligenceModel, run: AnalysisRun
 
     const layerName = layerForPath(document.path);
     const layerId = entityId("layer", repositoryFullName, layerName);
+    layersByPath.set(document.path, layerId);
     model.upsertEntity({
       id: layerId,
       kind: "layer",
@@ -144,7 +146,7 @@ export function ingestAnalysisRun(model: CodeIntelligenceModel, run: AnalysisRun
           toId: typeId,
         });
       }
-      if (RULE_NAME.test(symbol.name)) {
+      if (isRuleName(symbol.name)) {
         const ruleId = entityId("rule", repositoryFullName, `${document.path}#${symbol.name}`);
         model.upsertEntity({
           id: ruleId,
@@ -160,6 +162,12 @@ export function ingestAnalysisRun(model: CodeIntelligenceModel, run: AnalysisRun
           kind: "governs",
           fromId: ruleId,
           toId: id,
+        });
+        model.upsertRelation({
+          id: relationId("governs", ruleId, file.id),
+          kind: "governs",
+          fromId: ruleId,
+          toId: file.id,
         });
       }
     }
@@ -221,12 +229,14 @@ export function ingestAnalysisRun(model: CodeIntelligenceModel, run: AnalysisRun
       });
     }
 
+    const pathComponentIds: string[] = [];
     for (const component of document.components) {
       const componentId = entityId(
         "component",
         repositoryFullName,
         `${document.path}#${component.kind}:${component.name}`,
       );
+      pathComponentIds.push(componentId);
       model.upsertEntity({
         id: componentId,
         kind: "component",
@@ -242,7 +252,30 @@ export function ingestAnalysisRun(model: CodeIntelligenceModel, run: AnalysisRun
         fromId: file.id,
         toId: componentId,
       });
+      if (component.kind === "module") {
+        const moduleId = entityId(
+          "module",
+          repositoryFullName,
+          `${document.path}#${component.name}`,
+        );
+        model.upsertEntity({
+          id: moduleId,
+          kind: "module",
+          name: component.name,
+          path: document.path,
+          repositoryFullName,
+          commitSha,
+          attributes: {},
+        });
+        model.upsertRelation({
+          id: relationId("contains", file.id, moduleId),
+          kind: "contains",
+          fromId: file.id,
+          toId: moduleId,
+        });
+      }
     }
+    componentsByPath.set(document.path, pathComponentIds);
 
     for (const endpoint of document.endpoints) {
       const endpointId = entityId(
@@ -315,6 +348,7 @@ export function ingestAnalysisRun(model: CodeIntelligenceModel, run: AnalysisRun
         kind: "flows-to",
         fromId,
         toId,
+        attributes: { flowKind: flow.kind },
       });
     }
   }
@@ -337,5 +371,25 @@ export function ingestAnalysisRun(model: CodeIntelligenceModel, run: AnalysisRun
       fromId,
       toId,
     });
+    for (const fromComponent of componentsByPath.get(link.fromPath) ?? []) {
+      for (const toComponent of componentsByPath.get(link.toPath) ?? []) {
+        model.upsertRelation({
+          id: relationId("depends-on", fromComponent, toComponent),
+          kind: "depends-on",
+          fromId: fromComponent,
+          toId: toComponent,
+        });
+      }
+    }
+    const fromLayer = layersByPath.get(link.fromPath);
+    const toLayer = layersByPath.get(link.toPath);
+    if (fromLayer !== undefined && toLayer !== undefined && fromLayer !== toLayer) {
+      model.upsertRelation({
+        id: relationId("depends-on", fromLayer, toLayer),
+        kind: "depends-on",
+        fromId: fromLayer,
+        toId: toLayer,
+      });
+    }
   }
 }

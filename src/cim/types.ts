@@ -17,6 +17,7 @@ export type CimRelation = {
   kind: RelationKind;
   fromId: string;
   toId: string;
+  attributes?: Record<string, CimAttribute>;
 };
 
 export type CimSnapshot = {
