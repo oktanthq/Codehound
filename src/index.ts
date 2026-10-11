@@ -51,3 +51,10 @@ export {
   RerankingRetriever,
   evaluateRetriever,
 } from "./rag/index.js";
+
+export {
+  CodeIntelligenceModel,
+  CimQueryLayer,
+  InMemoryCimStore,
+  ingestAnalysisRun,
+} from "./cim/index.js";
