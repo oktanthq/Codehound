@@ -13,6 +13,7 @@ export { ENTITY_KINDS, RELATION_KINDS, isEntityKind, isRelationKind } from "./on
 export { CimQueryLayer } from "./query.js";
 export { isRuleName } from "./rules.js";
 export { InMemoryCimStore, persistModel } from "./store.js";
+export { getVersion, listVersions, persistNewVersion } from "./versioning.js";
 
 export type { EntityKind, RelationKind } from "./ontology.js";
 export type { CimGraph, NamedEdge } from "./graphs.js";

@@ -57,4 +57,5 @@ export {
   CimQueryLayer,
   InMemoryCimStore,
   ingestAnalysisRun,
+  persistNewVersion,
 } from "./cim/index.js";

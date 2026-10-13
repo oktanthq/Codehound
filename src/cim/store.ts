@@ -8,25 +8,27 @@ export type CimStore = {
   getLatest: (fullName: string) => Promise<CimSnapshot | undefined>;
 };
 
-function snapshotKey(fullName: string, commitSha: string): string {
-  return `${fullName.toLowerCase()}:${commitSha}`;
-}
-
 export class InMemoryCimStore implements CimStore {
-  private readonly items = new Map<string, CimSnapshot>();
+  private readonly items: CimSnapshot[] = [];
 
   async save(snapshot: CimSnapshot): Promise<CimSnapshot> {
-    this.items.set(snapshotKey(snapshot.repositoryFullName, snapshot.commitSha), snapshot);
+    this.items.push(snapshot);
     return snapshot;
   }
 
   async get(fullName: string, commitSha: string): Promise<CimSnapshot | undefined> {
-    return this.items.get(snapshotKey(fullName, commitSha));
+    const normalized = fullName.toLowerCase();
+    return this.items
+      .filter(
+        (item) =>
+          item.repositoryFullName.toLowerCase() === normalized && item.commitSha === commitSha,
+      )
+      .sort((left, right) => right.version - left.version)[0];
   }
 
   async list(fullName: string): Promise<CimSnapshot[]> {
     const normalized = fullName.toLowerCase();
-    return [...this.items.values()]
+    return this.items
       .filter((item) => item.repositoryFullName.toLowerCase() === normalized)
       .sort((left, right) => right.version - left.version);
   }
