@@ -13,7 +13,7 @@ Reasons:
 - Static analysis and RAG can be added as libraries (tree-sitter bindings, embedding clients, vector stores) behind module boundaries. Python analysis workers can still be introduced later if a specific parser or model stack requires them; they would sit behind the same `src/analysis` and `src/rag` interfaces.
 - One typed runtime keeps CI, packaging, and local setup simple while the GitHub Integration milestone is still the foundation everything else clones and queries against.
 
-Postgres (or an equivalent store) and a vector index are planned once repository metadata and RAG land. This milestone keeps those behind in-memory interfaces so later issues can swap persistence without rewriting GitHub auth, discovery, or ingest.
+Postgres (or an equivalent store) and a hosted vector index can replace the in-memory GitHub metadata, analysis, RAG, and CIM stores without rewriting those module boundaries. This tree keeps embeddings, vectors, and the CIM graph behind local implementations so tests and early local use do not need external credentials.
 
 ## Layout
 
@@ -33,7 +33,7 @@ docs/                   architecture and progress
 .github/workflows/      CI
 ```
 
-Modules that are not implemented yet are omitted from `src/` until their issues land. Callers should import from `src/github` or `src/analysis` (or the package root) rather than reaching around GitHub HTTP or parser details.
+Modules that are not implemented yet are omitted from `src/` until their issues land. Callers should import from `src/github`, `src/analysis`, `src/rag`, or `src/cim` (or the package root) rather than reaching around GitHub HTTP, parser, embedding, or graph details.
 
 ## GitHub Integration
 
@@ -62,6 +62,28 @@ Analysis is language-agnostic at the pipeline layer. GitHub ingest produces a fi
 4. **Results** are `AnalysisDocument` values plus a skip list and import links. `InMemoryAnalysisStore` keeps runs by repository and commit SHA.
 
 Callers should import from `src/analysis` (or the package root) rather than constructing language-specific parsers ad hoc.
+
+## Code RAG and retrieval
+
+Retrieval sits on analysis documents and raw file text. It does not call GitHub HTTP.
+
+1. **Chunking** splits source on extracted symbols (plus a file preamble) and markdown on headings; leftover text uses a sliding window (40 lines, 5-line overlap).
+2. **Embeddings** go through an `Embedder` interface. `HashingEmbedder` is the local default (token hashing, L2-normalized, cosine similarity). A remote embedding client can implement the same interface later.
+3. **Vector storage** is a `VectorStore`. `InMemoryVectorStore` holds embedded chunks and filters by repository, path, language, and symbol metadata.
+4. **Search** combines semantic nearest-neighbor search with BM25 keyword search (`k1=1.2`, `b=0.75`). Hybrid retrieval fuses the two ranked lists with reciprocal rank fusion (`k=60`).
+5. **Ranking** wraps any retriever: symbol-name boosts, metadata filters, and path/rerank boosts.
+6. **Incremental index** replaces chunks for a path or repository when the SHA-256 digest of chunk text changes.
+7. **Eval** scores retrievers with recall@k and mean reciprocal rank on labeled cases.
+
+## Code Intelligence Model
+
+The CIM is a typed entity/relation graph built from an `AnalysisRun`.
+
+1. **Ontology** names entity kinds (project, repository, file, module, symbol, component, endpoint, type, layer, rule) and relation kinds (contains, imports, depends-on, calls, extends, implements, aliases, exposes, flows-to, governs).
+2. **Ingest** maps analysis documents into that graph: files and symbols, import/dependency edges, calls, components and modules, endpoints, data-flow `flows-to` edges, architecture layers from path prefixes, and business rules from `validate`/`assert`/`ensure`/`check`/`guard` symbol names (`governs` the symbol and its file).
+3. **Storage** is a `CimStore`. `InMemoryCimStore` keeps versioned snapshots per repository. `persistNewVersion` bumps the model version before save.
+4. **Incremental updates** drop entities (and incident relations) by file path, then re-ingest the new analysis for that path.
+5. **Query** (`CimQueryLayer`) exposes entity filters plus dependency, call, component, layer, data-flow, and rule-binding graphs.
 
 ## Design rules
 
