@@ -59,3 +59,11 @@ export {
   ingestAnalysisRun,
   persistNewVersion,
 } from "./cim/index.js";
+
+export {
+  IntelligenceHost,
+  McpServer,
+  MCP_PROTOCOL_VERSION,
+  TOOL_CATALOG,
+  listenStdio,
+} from "./mcp/index.js";
