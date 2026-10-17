@@ -68,4 +68,4 @@ export {
   listenStdio,
 } from "./mcp/index.js";
 
-export { InMemoryPullStore, PullRequestIngestor } from "./review/index.js";
+export { InMemoryPullStore, PullRequestIngestor, analyzePullDiff, parsePatch } from "./review/index.js";
