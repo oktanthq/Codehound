@@ -72,6 +72,7 @@ export {
   InMemoryPullStore,
   PullRequestIngestor,
   analyzePullDiff,
+  analyzePullImpact,
   parsePatch,
   retrieveChangedCodeContext,
 } from "./review/index.js";
