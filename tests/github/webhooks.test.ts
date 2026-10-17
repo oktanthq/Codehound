@@ -134,6 +134,36 @@ describe("WebhookHandler", () => {
     });
   });
 
+  it("parses a pull request event", async () => {
+    const { raw, signature } = signed({
+      action: "synchronize",
+      installation: { id: 9 },
+      repository: { full_name: "oktant/demo" },
+      pull_request: {
+        number: 12,
+        title: "Add greet",
+        state: "open",
+        draft: false,
+        html_url: "https://github.com/oktant/demo/pull/12",
+        user: { login: "dev" },
+        base: { ref: "main", sha: "aaa", repo: { full_name: "oktant/demo" } },
+        head: { ref: "feat", sha: "bbb" },
+      },
+    });
+    const parsed = await handler().handle(raw, {
+      "x-github-event": "pull_request",
+      "x-github-delivery": "del-pr",
+      "x-hub-signature-256": signature,
+    });
+    expect(parsed).toMatchObject({
+      type: "pull_request",
+      action: "synchronize",
+      number: 12,
+      headSha: "bbb",
+      fullName: "oktant/demo",
+    });
+  });
+
   it("rejects missing webhook secret", () => {
     expect(() => new WebhookHandler("")).toThrow(GitHubAppError);
   });

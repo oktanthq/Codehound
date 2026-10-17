@@ -79,7 +79,13 @@ export type {
   TrackedBranch,
   TrackedCommit,
 } from "./tracking.js";
-export type { DeliveryStore, ParsedWebhook, ParsedPush, WebhookHeaders } from "./webhooks.js";
+export type {
+  DeliveryStore,
+  ParsedWebhook,
+  ParsedPush,
+  ParsedPullRequest,
+  WebhookHeaders,
+} from "./webhooks.js";
 export type {
   GitHubAppCredentials,
   Installation,

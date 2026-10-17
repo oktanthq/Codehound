@@ -80,6 +80,24 @@ export type ParsedInstallationRepositories = {
   removed: string[];
 };
 
+export type ParsedPullRequest = {
+  type: "pull_request";
+  deliveryId: string;
+  installationId: number;
+  fullName: string;
+  action: string;
+  number: number;
+  title: string;
+  state: string;
+  draft: boolean;
+  baseRef: string;
+  baseSha: string;
+  headRef: string;
+  headSha: string;
+  htmlUrl: string;
+  author: string;
+};
+
 export type ParsedIgnored = {
   type: "ignored";
   deliveryId: string;
@@ -99,6 +117,7 @@ export type ParsedWebhook =
   | ParsedDelete
   | ParsedInstallation
   | ParsedInstallationRepositories
+  | ParsedPullRequest
   | ParsedIgnored
   | ParsedDuplicate;
 
@@ -278,6 +297,30 @@ export function parseWebhookEvent(
       deliveryId,
       installationId: requireInstallationId(record),
       action: readString(record.action),
+    };
+  }
+
+  if (event === "pull_request") {
+    const pull = asRecord(record.pull_request ?? {});
+    const base = asRecord(pull.base ?? {});
+    const head = asRecord(pull.head ?? {});
+    const user = asRecord(pull.user ?? {});
+    return {
+      type: "pull_request",
+      deliveryId,
+      installationId: requireInstallationId(record),
+      fullName: requireRepoFullName(record),
+      action: readString(record.action),
+      number: typeof pull.number === "number" ? pull.number : 0,
+      title: readString(pull.title),
+      state: readString(pull.state),
+      draft: pull.draft === true,
+      baseRef: readString(base.ref),
+      baseSha: readString(base.sha),
+      headRef: readString(head.ref),
+      headSha: readString(head.sha),
+      htmlUrl: readString(pull.html_url),
+      author: readString(user.login),
     };
   }
 
