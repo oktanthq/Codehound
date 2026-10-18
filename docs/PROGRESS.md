@@ -52,6 +52,22 @@ Work happens on the `dev` branch.
 - OKT-66 Implement incremental CIM updates
 - OKT-67 Implement CIM versioning
 - OKT-68 Implement CIM query layer
+- OKT-69 Design Codehound MCP interface
+- OKT-70 Implement MCP server
+- OKT-71 Implement project discovery tools
+- OKT-72 Implement code/context retrieval tools
+- OKT-73 Implement dependency graph queries
+- OKT-74 Implement call graph queries
+- OKT-75 Implement component/architecture queries
+- OKT-76 Implement business-rule queries
+- OKT-77 Implement impact-analysis queries
+- OKT-78 Implement RAG + CIM context composition
+- OKT-79 Implement agent-oriented response formatting
+- OKT-80 Test MCP compatibility with target coding agents
+- OKT-81 Implement PR ingestion and synchronization
+- OKT-82 Implement diff analysis
+- OKT-83 Implement changed-code context retrieval
+- OKT-84 Implement CIM-based impact analysis
 
 GitHub Integration is complete (OKT-21 through OKT-31). OKT-30 is archived and duplicates OKT-31, so it was not implemented separately.
 
@@ -61,10 +77,14 @@ Code RAG & Retrieval Engine is complete (OKT-44 through OKT-54). Embeddings use 
 
 Code Intelligence Model is complete (OKT-55 through OKT-68). Persistence is `CimStore` / `InMemoryCimStore`. No archived duplicates were skipped in OKT-44 through OKT-68.
 
+MCP Project Intelligence Server is complete (OKT-69 through OKT-80). The server is a local JSON-RPC implementation (`McpServer`, stdio framing). Retrieval still uses the hashing embedder and in-memory vector store. No archived duplicates were skipped in OKT-69 through OKT-80.
+
+Intelligent PR Review is started (OKT-81 through OKT-84). Remaining review issues begin at OKT-85. GitHub HTTP is mocked in tests; no live GitHub credentials are required.
+
 ## Partial
 
-None.
+None for the MCP milestone. Intelligent PR Review continues at OKT-85.
 
 ## Next
 
-- OKT-69 Design Codehound MCP interface
+- OKT-85 Implement code smell detection

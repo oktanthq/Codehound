@@ -33,7 +33,7 @@ docs/                   architecture and progress
 .github/workflows/      CI
 ```
 
-Modules that are not implemented yet are omitted from `src/` until their issues land. Callers should import from `src/github`, `src/analysis`, `src/rag`, or `src/cim` (or the package root) rather than reaching around GitHub HTTP, parser, embedding, or graph details.
+Modules that are not implemented yet are omitted from `src/` until their issues land. Callers should import from `src/github`, `src/analysis`, `src/rag`, `src/cim`, `src/mcp`, or `src/review` (or the package root) rather than reaching around GitHub HTTP, parser, embedding, graph, or JSON-RPC details.
 
 ## GitHub Integration
 
@@ -84,6 +84,24 @@ The CIM is a typed entity/relation graph built from an `AnalysisRun`.
 3. **Storage** is a `CimStore`. `InMemoryCimStore` keeps versioned snapshots per repository. `persistNewVersion` bumps the model version before save.
 4. **Incremental updates** drop entities (and incident relations) by file path, then re-ingest the new analysis for that path.
 5. **Query** (`CimQueryLayer`) exposes entity filters plus dependency, call, component, layer, data-flow, and rule-binding graphs.
+
+## MCP project intelligence server
+
+The MCP server speaks JSON-RPC 2.0 over newline-delimited stdio (and Content-Length frames). It does not require a hosted MCP gateway.
+
+1. **Protocol** supports `2024-11-05`, `2025-03-26`, and `2025-06-18`. `initialize`, `ping`, `tools/list`, `tools/call`, empty `resources/list` / `prompts/list`, and `notifications/initialized` are implemented.
+2. **Tools** are named `codehound_*` and cover project discovery, code retrieval, dependency and call graphs, components and layers, business rules, impact analysis, and RAG+CIM context composition.
+3. **Host** (`IntelligenceHost`) holds in-memory CIM models, file text, and an optional `Retriever`. Tests use the local hashing embedder and hybrid retriever; a remote retriever can be injected later.
+4. **Responses** are agent-oriented: JSON text plus `structuredContent` with `summary`, `data`, `citations`, and `hints`.
+
+## Pull request review
+
+PR review talks to GitHub through the existing App installation client (mocked HTTP in tests).
+
+1. **Ingest** loads a pull request, its files, and commits, and stores them in `InMemoryPullStore`. `pull_request` webhooks can trigger the same path.
+2. **Diff analysis** parses unified patches into hunks and added/deleted line numbers.
+3. **Changed-code context** retrieves indexed chunks that overlap those lines.
+4. **Impact** asks the CIM for dependents, dependencies, layers, and rules of changed paths.
 
 ## Design rules
 
