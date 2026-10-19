@@ -71,8 +71,12 @@ export {
 export {
   InMemoryPullStore,
   PullRequestIngestor,
+  GitHubReviewPublisher,
   analyzePullDiff,
   analyzePullImpact,
+  detectCodeSmells,
+  detectBadPractices,
   parsePatch,
   retrieveChangedCodeContext,
+  reviewPull,
 } from "./review/index.js";
