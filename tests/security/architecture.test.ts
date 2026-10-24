@@ -56,6 +56,6 @@ describe("security analysis architecture", () => {
     expect(report.findings).toHaveLength(1);
     expect(report.findings[0]?.ruleId).toBe("sast.fixture");
     expect(report.findings[0]?.cwe).toBe("CWE-94");
-    expect(createDefaultSecurityPipeline().list()).toHaveLength(0);
+    expect(createDefaultSecurityPipeline().list().map((scanner) => scanner.id)).toContain("sast");
   });
 });
