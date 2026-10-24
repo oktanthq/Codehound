@@ -102,6 +102,18 @@ PR review talks to GitHub through the existing App installation client (mocked H
 2. **Diff analysis** parses unified patches into hunks and added/deleted line numbers.
 3. **Changed-code context** retrieves indexed chunks that overlap those lines.
 4. **Impact** asks the CIM for dependents, dependencies, layers, and rules of changed paths.
+5. **Detectors** scan added and deleted lines for smells, bad practices, architecture and rule violations, regression risk, and security sinks. A classifier can raise severity when a file has many dependents.
+6. **Comments and summary** turn findings into Markdown inline comments and a review body. High or critical findings request changes; a clean review approves.
+7. **Publish** posts that review through the GitHub App installation client (`pull_requests:write`). Tests mock HTTP.
+
+## Code-change suggestions
+
+Suggestions are local rewrites, not a hosted model API.
+
+1. **Pipeline** maps a finding or issue onto code, generates single-file and multi-file edits, emits unified diffs, and validates the result.
+2. **Guards** refuse dropped exports that still have dependents, application imports of tests, and deletion of `validate`/`assert`/`ensure`/`check`/`guard` rules.
+3. **Tests** propose a companion test module for new `src/` exports.
+4. **Integration** attaches a `diff` fence to matching PR review comments when validation passes.
 
 ## Design rules
 

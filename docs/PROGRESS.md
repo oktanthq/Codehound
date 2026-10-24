@@ -68,6 +68,28 @@ Work happens on the `dev` branch.
 - OKT-82 Implement diff analysis
 - OKT-83 Implement changed-code context retrieval
 - OKT-84 Implement CIM-based impact analysis
+- OKT-85 Implement code smell detection
+- OKT-86 Implement bad-practice detection
+- OKT-87 Implement architecture violation detection
+- OKT-88 Implement business-rule violation detection
+- OKT-89 Implement regression-risk analysis
+- OKT-90 Implement security-risk detection
+- OKT-91 Implement automated review comments
+- OKT-92 Implement PR summary generation
+- OKT-93 Implement review severity classification
+- OKT-94 Integrate Codehound review with GitHub PRs
+- OKT-95 Design context-aware change generation pipeline
+- OKT-96 Implement issue-to-code context mapping
+- OKT-97 Implement single-file code suggestions
+- OKT-98 Implement multi-file code changes
+- OKT-99 Implement dependency-aware modifications
+- OKT-100 Implement architecture-aware modifications
+- OKT-101 Implement business-rule preservation checks
+- OKT-102 Implement patch/diff generation
+- OKT-103 Implement test generation/update suggestions
+- OKT-104 Implement change impact analysis
+- OKT-105 Implement generated-change validation
+- OKT-106 Integrate remediation suggestions into PR review
 
 GitHub Integration is complete (OKT-21 through OKT-31). OKT-30 is archived and duplicates OKT-31, so it was not implemented separately.
 
@@ -79,12 +101,14 @@ Code Intelligence Model is complete (OKT-55 through OKT-68). Persistence is `Cim
 
 MCP Project Intelligence Server is complete (OKT-69 through OKT-80). The server is a local JSON-RPC implementation (`McpServer`, stdio framing). Retrieval still uses the hashing embedder and in-memory vector store. No archived duplicates were skipped in OKT-69 through OKT-80.
 
-Intelligent PR Review is started (OKT-81 through OKT-84). Remaining review issues begin at OKT-85. GitHub HTTP is mocked in tests; no live GitHub credentials are required.
+Intelligent PR Review is complete (OKT-81 through OKT-94). Detectors and GitHub review publishing use mocked HTTP; no live GitHub credentials are required.
+
+Intelligent Code-Change Suggestions is complete (OKT-95 through OKT-106). Edits are local rewrites behind `generateSuggestions`; there is no hosted generation API. No archived duplicates were skipped in OKT-85 through OKT-106.
 
 ## Partial
 
-None for the MCP milestone. Intelligent PR Review continues at OKT-85.
+None.
 
 ## Next
 
-- OKT-85 Implement code smell detection
+- OKT-107 Design Codehound security analysis architecture
