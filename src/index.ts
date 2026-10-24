@@ -80,3 +80,9 @@ export {
   retrieveChangedCodeContext,
   reviewPull,
 } from "./review/index.js";
+
+export {
+  generateSuggestions,
+  attachSuggestionsToReport,
+  unifiedDiff,
+} from "./suggestions/index.js";
