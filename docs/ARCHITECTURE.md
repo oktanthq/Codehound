@@ -33,7 +33,7 @@ docs/                   architecture and progress
 .github/workflows/      CI
 ```
 
-Modules that are not implemented yet are omitted from `src/` until their issues land. Callers should import from `src/github`, `src/analysis`, `src/rag`, `src/cim`, `src/mcp`, or `src/review` (or the package root) rather than reaching around GitHub HTTP, parser, embedding, graph, or JSON-RPC details.
+Modules that are not implemented yet are omitted from `src/` until their issues land. Callers should import from `src/github`, `src/analysis`, `src/rag`, `src/cim`, `src/mcp`, `src/review`, `src/suggestions`, or `src/security` (or the package root) rather than reaching around GitHub HTTP, parser, embedding, graph, JSON-RPC, or vulnerability-feed details.
 
 ## GitHub Integration
 
@@ -114,6 +114,18 @@ Suggestions are local rewrites, not a hosted model API.
 2. **Guards** refuse dropped exports that still have dependents, application imports of tests, and deletion of `validate`/`assert`/`ensure`/`check`/`guard` rules.
 3. **Tests** propose a companion test module for new `src/` exports.
 4. **Integration** attaches a `diff` fence to matching PR review comments when validation passes.
+
+## Vulnerability assessment
+
+Security analysis is a pipeline of scanners over repository files, analysis documents, and the CIM. It does not require a hosted vulnerability feed.
+
+1. **Context** (`SecurityScanContext`) holds file text, optional `AnalysisRun` and `CimQueryLayer`, and manifest files (`package.json` / lockfiles).
+2. **Scanners** implement `VulnerabilityScanner`. The `SecurityPipeline` runs them in order and returns a `SecurityScanReport`.
+3. **Advisories** go through `AdvisoryDatabase`. `LocalAdvisoryDatabase` is the default (curated npm ranges); a GitHub Advisory or OSV client can implement the same interface later.
+4. **Stages** are SAST, dependency scanning, secrets, authn/authz, taint/data-flow, injection, insecure APIs, security business rules, cross-component tracing, severity classification, and remediation.
+5. **Findings** carry CWE/CVE, package identity, and an optional trace. Review integration maps them onto PR comments for changed paths.
+
+Callers should import from `src/security` (or the package root) rather than talking to a vulnerability API directly.
 
 ## Design rules
 

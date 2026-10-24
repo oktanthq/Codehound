@@ -86,3 +86,11 @@ export {
   attachSuggestionsToReport,
   unifiedDiff,
 } from "./suggestions/index.js";
+
+export {
+  createDefaultSecurityPipeline,
+  pipelineStages as securityPipelineStages,
+  SecurityPipeline,
+  securityContext,
+  makeVulnerability,
+} from "./security/index.js";
