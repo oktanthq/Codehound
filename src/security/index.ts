@@ -18,6 +18,7 @@ export { DependencyScanner, dependencyScanner, parseInstalledPackages } from "./
 export { BUILTIN_SAST_RULES, SastRulesEngine, sastScanner } from "./sast.js";
 export { parseSemver, versionSatisfies } from "./semver.js";
 export { SecretScanner, secretScanner } from "./secrets.js";
+export { TracingScanner, tracingScanner } from "./tracing.js";
 export { makeVulnerability, vulnerabilityId, VULN_CATEGORIES, VULN_SEVERITIES } from "./types.js";
 
 export type { Advisory, AdvisoryDatabase, VulnerabilityScanner } from "./architecture.js";

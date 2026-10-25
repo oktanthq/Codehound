@@ -66,6 +66,7 @@ describe("security analysis architecture", () => {
         "injection",
         "insecure-api",
         "business-rule",
+        "tracing",
       ]),
     );
   });
