@@ -1,4 +1,5 @@
-import { type VulnerabilityScanner } from "./architecture.js";
+import { type AdvisoryDatabase, type VulnerabilityScanner } from "./architecture.js";
+import { dependencyScanner } from "./dependencies.js";
 import { sastScanner } from "./sast.js";
 import type { SecurityScanContext, SecurityScanReport, VulnerabilityFinding } from "./types.js";
 
@@ -31,6 +32,8 @@ export class SecurityPipeline {
   }
 }
 
-export function createDefaultSecurityPipeline(): SecurityPipeline {
-  return new SecurityPipeline([sastScanner()]);
+export function createDefaultSecurityPipeline(options: {
+  advisories?: AdvisoryDatabase;
+} = {}): SecurityPipeline {
+  return new SecurityPipeline([sastScanner(), dependencyScanner(options.advisories)]);
 }
