@@ -57,7 +57,7 @@ describe("security analysis architecture", () => {
     expect(report.findings[0]?.ruleId).toBe("sast.fixture");
     expect(report.findings[0]?.cwe).toBe("CWE-94");
     expect(createDefaultSecurityPipeline().list().map((scanner) => scanner.id)).toEqual(
-      expect.arrayContaining(["sast", "dependency", "secret", "auth", "dataflow"]),
+      expect.arrayContaining(["sast", "dependency", "secret", "auth", "dataflow", "injection"]),
     );
   });
 });

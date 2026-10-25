@@ -6,6 +6,7 @@ export {
 export { createDefaultSecurityPipeline, SecurityPipeline } from "./engine.js";
 export { AuthScanner, authScanner } from "./auth.js";
 export { DataflowScanner, dataflowScanner } from "./dataflow.js";
+export { InjectionScanner, injectionScanner } from "./injection.js";
 export { LOCAL_ADVISORIES, LocalAdvisoryDatabase } from "./advisories.js";
 export { DependencyScanner, dependencyScanner, parseInstalledPackages } from "./dependencies.js";
 export { BUILTIN_SAST_RULES, SastRulesEngine, sastScanner } from "./sast.js";
