@@ -1,5 +1,6 @@
 import { type AdvisoryDatabase, type VulnerabilityScanner } from "./architecture.js";
 import { authScanner } from "./auth.js";
+import { dataflowScanner } from "./dataflow.js";
 import { dependencyScanner } from "./dependencies.js";
 import { sastScanner } from "./sast.js";
 import { secretScanner } from "./secrets.js";
@@ -42,5 +43,6 @@ export function createDefaultSecurityPipeline(options: {
     dependencyScanner(options.advisories),
     secretScanner(),
     authScanner(),
+    dataflowScanner(),
   ]);
 }
