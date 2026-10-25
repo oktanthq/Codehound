@@ -4,6 +4,7 @@ export {
   SECURITY_PIPELINE_STAGES,
 } from "./architecture.js";
 export { createDefaultSecurityPipeline, SecurityPipeline } from "./engine.js";
+export { InsecureApiScanner, insecureApiScanner } from "./apis.js";
 export { AuthScanner, authScanner } from "./auth.js";
 export { DataflowScanner, dataflowScanner } from "./dataflow.js";
 export { InjectionScanner, injectionScanner } from "./injection.js";
