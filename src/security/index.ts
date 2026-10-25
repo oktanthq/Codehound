@@ -6,6 +6,11 @@ export {
 export { createDefaultSecurityPipeline, SecurityPipeline } from "./engine.js";
 export { InsecureApiScanner, insecureApiScanner } from "./apis.js";
 export { AuthScanner, authScanner } from "./auth.js";
+export {
+  isSecurityRuleName,
+  SecurityRuleScanner,
+  securityRuleScanner,
+} from "./business-rules.js";
 export { DataflowScanner, dataflowScanner } from "./dataflow.js";
 export { InjectionScanner, injectionScanner } from "./injection.js";
 export { LOCAL_ADVISORIES, LocalAdvisoryDatabase } from "./advisories.js";

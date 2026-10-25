@@ -65,6 +65,7 @@ describe("security analysis architecture", () => {
         "dataflow",
         "injection",
         "insecure-api",
+        "business-rule",
       ]),
     );
   });
