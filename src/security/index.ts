@@ -24,6 +24,11 @@ export {
   severityRank,
 } from "./severity.js";
 export { SecretScanner, secretScanner } from "./secrets.js";
+export {
+  combineRemediationPatches,
+  remediateFinding,
+  suggestRemediations,
+} from "./remediate.js";
 export { TracingScanner, tracingScanner } from "./tracing.js";
 export { makeVulnerability, vulnerabilityId, VULN_CATEGORIES, VULN_SEVERITIES } from "./types.js";
 
