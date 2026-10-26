@@ -8,6 +8,7 @@ import { tracingScanner } from "./tracing.js";
 import { injectionScanner } from "./injection.js";
 import { sastScanner } from "./sast.js";
 import { secretScanner } from "./secrets.js";
+import { classifyVulnerabilities } from "./severity.js";
 import type { SecurityScanContext, SecurityScanReport, VulnerabilityFinding } from "./types.js";
 
 export class SecurityPipeline {
@@ -33,7 +34,7 @@ export class SecurityPipeline {
       findings.push(...result);
     }
     return {
-      findings,
+      findings: classifyVulnerabilities(findings, context),
       scanners: this.scanners.map((scanner) => scanner.id),
     };
   }

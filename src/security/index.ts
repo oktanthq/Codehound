@@ -17,6 +17,12 @@ export { LOCAL_ADVISORIES, LocalAdvisoryDatabase } from "./advisories.js";
 export { DependencyScanner, dependencyScanner, parseInstalledPackages } from "./dependencies.js";
 export { BUILTIN_SAST_RULES, SastRulesEngine, sastScanner } from "./sast.js";
 export { parseSemver, versionSatisfies } from "./semver.js";
+export {
+  bumpSeverity,
+  classifyVulnerabilities,
+  scoreVulnerability,
+  severityRank,
+} from "./severity.js";
 export { SecretScanner, secretScanner } from "./secrets.js";
 export { TracingScanner, tracingScanner } from "./tracing.js";
 export { makeVulnerability, vulnerabilityId, VULN_CATEGORIES, VULN_SEVERITIES } from "./types.js";
