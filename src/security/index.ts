@@ -4,6 +4,11 @@ export {
   SECURITY_PIPELINE_STAGES,
 } from "./architecture.js";
 export { createDefaultSecurityPipeline, SecurityPipeline } from "./engine.js";
+export {
+  evaluateSecurityScan,
+  scoreCase,
+  securityBenchmarkCases,
+} from "./eval.js";
 export { InsecureApiScanner, insecureApiScanner } from "./apis.js";
 export { AuthScanner, authScanner } from "./auth.js";
 export {
