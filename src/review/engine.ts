@@ -12,12 +12,15 @@ import { detectCodeSmells } from "./smells.js";
 import { summarizeReview, type ReviewSummary } from "./summary.js";
 import type { AnalyzedFileDiff, IngestedPull } from "./types.js";
 import type { CimQueryLayer } from "../cim/query.js";
+import { toReviewFindings } from "../security/integrate.js";
+import type { VulnerabilityFinding } from "../security/types.js";
 
 export type ReviewInput = {
   pull?: IngestedPull;
   diffs?: AnalyzedFileDiff[];
   query?: CimQueryLayer;
   files?: Map<string, string>;
+  securityFindings?: VulnerabilityFinding[] | undefined;
 };
 
 export type ReviewReport = {
@@ -49,7 +52,9 @@ export function reviewPull(input: ReviewInput): ReviewReport {
     files: input.files ?? new Map(),
     pull: input.pull,
   };
-  const findings = classifyFindings(collectFindings(context), impact);
+  const extra =
+    input.securityFindings === undefined ? [] : toReviewFindings(input.securityFindings);
+  const findings = classifyFindings([...collectFindings(context), ...extra], impact);
   return {
     diffs,
     impact,

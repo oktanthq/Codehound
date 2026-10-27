@@ -93,4 +93,6 @@ export {
   SecurityPipeline,
   securityContext,
   makeVulnerability,
+  mergeSecurityIntoReview,
+  suggestRemediations,
 } from "./security/index.js";

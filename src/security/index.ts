@@ -30,6 +30,7 @@ export {
   suggestRemediations,
 } from "./remediate.js";
 export { TracingScanner, tracingScanner } from "./tracing.js";
+export { mergeSecurityIntoReview, toReviewFindings } from "./integrate.js";
 export { makeVulnerability, vulnerabilityId, VULN_CATEGORIES, VULN_SEVERITIES } from "./types.js";
 
 export type { Advisory, AdvisoryDatabase, VulnerabilityScanner } from "./architecture.js";
