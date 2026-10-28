@@ -1,0 +1,95 @@
+import type { FileKind } from "../github/languages.js";
+
+export type AnalysisFile = {
+  path: string;
+  language: string | undefined;
+  kind: FileKind;
+  content: string | undefined;
+};
+
+export type AnalysisContext = {
+  repositoryFullName: string;
+  commitSha: string;
+  ref: string;
+};
+
+export type AnalysisSymbol = {
+  name: string;
+  kind: string;
+  startLine: number;
+  endLine: number;
+};
+
+export type AnalysisImport = {
+  source: string;
+  kind: "import" | "export" | "require" | "dynamic";
+};
+
+export type CallEdge = {
+  from: string;
+  to: string;
+  startLine: number;
+};
+
+export type TypeRelation = {
+  from: string;
+  kind: "extends" | "implements" | "alias";
+  to: string;
+};
+
+export type ApiEndpoint = {
+  method: string;
+  path: string;
+  handler: string | undefined;
+  startLine: number;
+};
+
+export type DataFlowEdge = {
+  from: string;
+  to: string;
+  kind: "assign" | "return" | "argument";
+  startLine: number;
+};
+
+export type DetectedComponent = {
+  name: string;
+  kind: "module" | "component" | "controller" | "service";
+  path: string;
+};
+
+export type CrossFileLink = {
+  fromPath: string;
+  toPath: string;
+  kind: "import";
+  specifier: string;
+};
+
+export type AnalysisDocument = {
+  path: string;
+  language: string;
+  adapterId: string;
+  symbols: AnalysisSymbol[];
+  imports: AnalysisImport[];
+  calls: CallEdge[];
+  relations: TypeRelation[];
+  endpoints: ApiEndpoint[];
+  dataFlows: DataFlowEdge[];
+  components: DetectedComponent[];
+};
+
+export type SkipReason =
+  "undetected-language" | "unsupported-language" | "adapter-failed" | "empty-file";
+
+export type SkippedFile = {
+  path: string;
+  language: string | undefined;
+  reason: SkipReason;
+  message: string | undefined;
+};
+
+export type AnalysisRun = {
+  context: AnalysisContext;
+  documents: AnalysisDocument[];
+  skipped: SkippedFile[];
+  links: CrossFileLink[];
+};
