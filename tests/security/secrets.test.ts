@@ -27,7 +27,7 @@ describe("secret and sensitive-data detection", () => {
     const findings = new SecretScanner().scan(
       securityContext({
         "src/ok.ts": [
-          'const password = process.env.PASSWORD;',
+          "const password = process.env.PASSWORD;",
           'const apiKey = "changeme";',
           'const token = "placeholder";',
         ].join("\n"),

@@ -85,8 +85,10 @@ const RULES: ApiRule[] = [
 
 function shouldKeep(rule: ApiRule, line: string, content: string): boolean {
   if (rule.id === "api.insecure-random") {
-    return /\b(token|secret|session|password|nonce|otp|key)\b/i.test(line) ||
-      /\b(token|secret|session)\b/i.test(content);
+    return (
+      /\b(token|secret|session|password|nonce|otp|key)\b/i.test(line) ||
+      /\b(token|secret|session)\b/i.test(content)
+    );
   }
   return true;
 }

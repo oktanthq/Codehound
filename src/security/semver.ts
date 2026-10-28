@@ -10,7 +10,12 @@ export function parseSemver(version: string): Semver | undefined {
     .replace(/^[vV]/, "")
     .replace(/^[~^>=<]+\s*/, "")
     .match(/^(\d+)\.(\d+)\.(\d+)/);
-  if (match === null || match[1] === undefined || match[2] === undefined || match[3] === undefined) {
+  if (
+    match === null ||
+    match[1] === undefined ||
+    match[2] === undefined ||
+    match[3] === undefined
+  ) {
     return undefined;
   }
   return {
@@ -57,7 +62,10 @@ export function versionSatisfies(version: string, range: string): boolean {
     }
     return compareSemver(parsed, low) >= 0 && compareSemver(parsed, high) <= 0;
   }
-  const parts = range.trim().split(/\s+/).filter((part) => part.length > 0);
+  const parts = range
+    .trim()
+    .split(/\s+/)
+    .filter((part) => part.length > 0);
   if (parts.length === 0) {
     return false;
   }

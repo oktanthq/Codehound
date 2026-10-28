@@ -1,10 +1,6 @@
 import type { VulnerabilityScanner } from "./architecture.js";
 import { isCodeComment, sourceLines } from "./text.js";
-import {
-  makeVulnerability,
-  type SecurityScanContext,
-  type VulnerabilityFinding,
-} from "./types.js";
+import { makeVulnerability, type SecurityScanContext, type VulnerabilityFinding } from "./types.js";
 
 const AUTH_HINT =
   /\b(authenticate|authorize|requireAuth|requireAdmin|isAuthenticated|checkPermission|passport|jwt\.verify|protect|allowlist|authn|authz|middleware\.auth)\b/i;
@@ -13,15 +9,19 @@ const PUBLIC_PATH = /^\/?(health|ping|status|ready|livez|readyz)?$/i;
 
 const SENSITIVE_PATH = /\/(admin|internal|private|account|user|users|me|settings|billing)\b/i;
 
-const ROUTE =
-  /\b(?:app|router)\.(get|post|put|patch|delete|all|use)\(\s*(['"`])([^'"`]+)\2/i;
+const ROUTE = /\b(?:app|router)\.(get|post|put|patch|delete|all|use)\(\s*(['"`])([^'"`]+)\2/i;
 
 const JWT_DECODE = /\bjwt\.decode\s*\(/;
 const JWT_VERIFY = /\bjwt\.verify\s*\(/;
 
 const AUTH_BYPASS = /\b(req\.(?:user|session)|currentUser)\s*=\s*req\.(query|body|params)/;
 
-function shouldFlagEndpoint(method: string, path: string, line: string, fileHasAuth: boolean): boolean {
+function shouldFlagEndpoint(
+  method: string,
+  path: string,
+  line: string,
+  fileHasAuth: boolean,
+): boolean {
   if (lineHasAuth(line)) {
     return false;
   }
@@ -39,7 +39,9 @@ function lineHasAuth(line: string): boolean {
   return AUTH_HINT.test(line);
 }
 
-function endpointsFromText(content: string): { method: string; path: string; line: number; text: string }[] {
+function endpointsFromText(
+  content: string,
+): { method: string; path: string; line: number; text: string }[] {
   const found: { method: string; path: string; line: number; text: string }[] = [];
   for (const row of sourceLines(content)) {
     if (isCodeComment(row.text)) {

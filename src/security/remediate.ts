@@ -6,8 +6,14 @@ function rewriteLine(ruleId: string, line: string): string | undefined {
   if (ruleId === "sast.eval" || ruleId === "dataflow.taint-eval") {
     return line.replaceAll(/\beval\s*\(/g, "JSON.parse(");
   }
-  if (ruleId === "sast.xss-html" || ruleId === "injection.xss" || ruleId === "dataflow.taint-html") {
-    return line.replaceAll(/\.innerHTML\b/g, ".textContent").replaceAll(/\.outerHTML\b/g, ".textContent");
+  if (
+    ruleId === "sast.xss-html" ||
+    ruleId === "injection.xss" ||
+    ruleId === "dataflow.taint-html"
+  ) {
+    return line
+      .replaceAll(/\.innerHTML\b/g, ".textContent")
+      .replaceAll(/\.outerHTML\b/g, ".textContent");
   }
   if (ruleId === "sast.weak-tls") {
     return line.replace("rejectUnauthorized: false", "rejectUnauthorized: true");
@@ -48,7 +54,10 @@ function rewriteLine(ruleId: string, line: string): string | undefined {
   return line;
 }
 
-function bumpDependency(finding: VulnerabilityFinding, files: Map<string, string>): SuggestionChange | undefined {
+function bumpDependency(
+  finding: VulnerabilityFinding,
+  files: Map<string, string>,
+): SuggestionChange | undefined {
   if (finding.packageName === undefined || finding.packageVersion === undefined) {
     return undefined;
   }

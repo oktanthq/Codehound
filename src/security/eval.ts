@@ -33,10 +33,10 @@ function predictedIds(findings: readonly VulnerabilityFinding[]): string[] {
   return unique(findings.map((finding) => finding.ruleId));
 }
 
-export function scoreCase(predicted: readonly string[], expected: readonly string[]): Omit<
-  SecurityEvalScores,
-  "id" | "predicted" | "expected"
-> {
+export function scoreCase(
+  predicted: readonly string[],
+  expected: readonly string[],
+): Omit<SecurityEvalScores, "id" | "predicted" | "expected"> {
   const predictedSet = new Set(predicted);
   const expectedSet = new Set(expected);
   let truePositives = 0;
@@ -47,7 +47,8 @@ export function scoreCase(predicted: readonly string[], expected: readonly strin
   }
   const falsePositives = [...predictedSet].filter((id) => !expectedSet.has(id)).length;
   const falseNegatives = [...expectedSet].filter((id) => !predictedSet.has(id)).length;
-  const precision = predictedSet.size === 0 ? (expectedSet.size === 0 ? 1 : 0) : truePositives / predictedSet.size;
+  const precision =
+    predictedSet.size === 0 ? (expectedSet.size === 0 ? 1 : 0) : truePositives / predictedSet.size;
   const recall = expectedSet.size === 0 ? 1 : truePositives / expectedSet.size;
   const f1 = precision + recall === 0 ? 0 : (2 * precision * recall) / (precision + recall);
   return { truePositives, falsePositives, falseNegatives, precision, recall, f1 };
@@ -122,7 +123,7 @@ export function securityBenchmarkCases(): SecurityEvalCase[] {
       files: [
         {
           path: "src/ok.ts",
-          content: 'export function add(a: number, b: number) { return a + b; }\n',
+          content: "export function add(a: number, b: number) { return a + b; }\n",
         },
       ],
       expectedRuleIds: [],

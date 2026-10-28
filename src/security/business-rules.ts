@@ -1,11 +1,7 @@
 import { isRuleName } from "../cim/rules.js";
 import type { VulnerabilityScanner } from "./architecture.js";
 import { isCodeComment, sourceLines } from "./text.js";
-import {
-  makeVulnerability,
-  type SecurityScanContext,
-  type VulnerabilityFinding,
-} from "./types.js";
+import { makeVulnerability, type SecurityScanContext, type VulnerabilityFinding } from "./types.js";
 
 export const SECURITY_RULE_NAME =
   /^(authenticate|authorize|sanitize|escapeHtml|encrypt|decrypt|hashPassword|verifyPassword|csrfProtect|rateLimit|validateAuth)/i;
@@ -14,7 +10,9 @@ const SECURITY_RULE_IN_SOURCE =
   /\b(authenticate|authorize|sanitize|escapeHtml|encrypt|decrypt|hashPassword|verifyPassword|csrfProtect|rateLimit|validateAuth)\b/;
 
 export function isSecurityRuleName(name: string): boolean {
-  return SECURITY_RULE_NAME.test(name) || (isRuleName(name) && /auth|csrf|sanitiz|encrypt/i.test(name));
+  return (
+    SECURITY_RULE_NAME.test(name) || (isRuleName(name) && /auth|csrf|sanitiz|encrypt/i.test(name))
+  );
 }
 
 const ENDPOINT = /\b(?:app|router)\.(get|post|put|patch|delete)\(/;
@@ -67,7 +65,9 @@ export class SecurityRuleScanner implements VulnerabilityScanner {
       if (context.query === undefined) {
         continue;
       }
-      const fileEntity = context.query.entities({ kind: "file" }).find((entity) => entity.path === path);
+      const fileEntity = context.query
+        .entities({ kind: "file" })
+        .find((entity) => entity.path === path);
       const fileGoverned = fileEntity !== undefined && governedFiles.has(fileEntity.id);
       if (!fileGoverned && !fileHasSecurityRule && securityRules.length > 0) {
         findings.push(

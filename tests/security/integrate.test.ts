@@ -54,9 +54,9 @@ describe("security findings in PR reviews", () => {
       true,
     );
     expect(merged.findings.some((finding) => finding.path === "src/other.ts")).toBe(false);
-    expect(merged.comments.some((comment) => comment.body.includes("auth.unprotected-endpoint"))).toBe(
-      true,
-    );
+    expect(
+      merged.comments.some((comment) => comment.body.includes("auth.unprotected-endpoint")),
+    ).toBe(true);
     expect(merged.summary.event).toBe("REQUEST_CHANGES");
   });
 

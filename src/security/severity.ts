@@ -47,7 +47,11 @@ export function scoreVulnerability(
   context: SecurityScanContext,
 ): SeverityScore {
   let severity = finding.severity;
-  if (finding.cwe !== undefined && CRITICAL_CWE.has(finding.cwe) && RANK[severity] < RANK.critical) {
+  if (
+    finding.cwe !== undefined &&
+    CRITICAL_CWE.has(finding.cwe) &&
+    RANK[severity] < RANK.critical
+  ) {
     severity = bumpSeverity(severity);
   }
   if (finding.cve !== undefined && RANK[severity] < RANK.high) {

@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { LocalAdvisoryDatabase } from "../../src/security/advisories.js";
 import { securityContext } from "../../src/security/architecture.js";
-import {
-  DependencyScanner,
-  parseInstalledPackages,
-} from "../../src/security/dependencies.js";
+import { DependencyScanner, parseInstalledPackages } from "../../src/security/dependencies.js";
 import { versionSatisfies } from "../../src/security/semver.js";
 
 describe("dependency vulnerability scanning", () => {
@@ -40,7 +37,7 @@ describe("dependency vulnerability scanning", () => {
       {
         path: "package.json",
         content: JSON.stringify({
-          dependencies: { "jsonwebtoken": "8.5.1" },
+          dependencies: { jsonwebtoken: "8.5.1" },
           devDependencies: { ws: "8.0.0" },
         }),
       },

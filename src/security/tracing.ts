@@ -1,10 +1,6 @@
 import type { VulnerabilityScanner } from "./architecture.js";
 import { fileHasTaintSinks, fileHasTaintSources, collectTaint } from "./taint.js";
-import {
-  makeVulnerability,
-  type SecurityScanContext,
-  type VulnerabilityFinding,
-} from "./types.js";
+import { makeVulnerability, type SecurityScanContext, type VulnerabilityFinding } from "./types.js";
 
 type FileEdge = { from: string; to: string };
 

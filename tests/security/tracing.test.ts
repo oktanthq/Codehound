@@ -12,11 +12,7 @@ describe("cross-component vulnerability tracing", () => {
       "  return runQuery(q);",
       "}",
     ].join("\n");
-    const db = [
-      "export function runQuery(q: string) {",
-      "  return query(q);",
-      "}",
-    ].join("\n");
+    const db = ["export function runQuery(q: string) {", "  return query(q);", "}"].join("\n");
     const run = await createDefaultAnalysisPipeline().analyze(
       { repositoryFullName: "oktant/demo", commitSha: "abc", ref: "main" },
       [
@@ -25,10 +21,7 @@ describe("cross-component vulnerability tracing", () => {
       ],
     );
     const findings = new TracingScanner().scan(
-      securityContext(
-        { "src/handler.ts": handler, "src/db.ts": db },
-        { analysis: run },
-      ),
+      securityContext({ "src/handler.ts": handler, "src/db.ts": db }, { analysis: run }),
     );
     expect(findings.some((finding) => finding.ruleId === "tracing.cross-component")).toBe(true);
     expect(findings[0]?.path).toBe("src/db.ts");
@@ -37,7 +30,8 @@ describe("cross-component vulnerability tracing", () => {
   });
 
   it("does not trace when the imported module has no sink", async () => {
-    const handler = 'import { add } from "./math.js";\nexport function handle(req: { query: { n: string } }) { return add(1, 2); }\n';
+    const handler =
+      'import { add } from "./math.js";\nexport function handle(req: { query: { n: string } }) { return add(1, 2); }\n';
     const math = "export function add(a: number, b: number) { return a + b; }\n";
     const run = await createDefaultAnalysisPipeline().analyze(
       { repositoryFullName: "oktant/demo", commitSha: "abc", ref: "main" },
@@ -47,10 +41,7 @@ describe("cross-component vulnerability tracing", () => {
       ],
     );
     const findings = new TracingScanner().scan(
-      securityContext(
-        { "src/handler.ts": handler, "src/math.ts": math },
-        { analysis: run },
-      ),
+      securityContext({ "src/handler.ts": handler, "src/math.ts": math }, { analysis: run }),
     );
     expect(findings).toEqual([]);
   });

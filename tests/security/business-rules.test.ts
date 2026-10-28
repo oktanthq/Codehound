@@ -24,13 +24,15 @@ describe("security business-rule analysis", () => {
       },
       {
         path: "src/orders.ts",
-        content: 'import express from "express";\nconst app = express();\napp.post("/orders", (req, res) => res.send("ok"));\n',
+        content:
+          'import express from "express";\nconst app = express();\napp.post("/orders", (req, res) => res.send("ok"));\n',
       },
     ]);
     const findings = new SecurityRuleScanner().scan(
       securityContext(
         {
-          "src/auth.ts": "export function validateAuth(token: string) { return token.length > 8; }\n",
+          "src/auth.ts":
+            "export function validateAuth(token: string) { return token.length > 8; }\n",
           "src/orders.ts":
             'import express from "express";\nconst app = express();\napp.post("/orders", (req, res) => res.send("ok"));\n',
         },
@@ -40,7 +42,8 @@ describe("security business-rule analysis", () => {
     expect(findings.some((finding) => finding.ruleId === "rule.ungoverned-endpoint")).toBe(true);
     expect(
       findings.some(
-        (finding) => finding.ruleId === "rule.ungoverned-endpoint" && finding.path === "src/auth.ts",
+        (finding) =>
+          finding.ruleId === "rule.ungoverned-endpoint" && finding.path === "src/auth.ts",
       ),
     ).toBe(false);
   });

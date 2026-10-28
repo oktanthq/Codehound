@@ -91,7 +91,8 @@ export function makeVulnerability(
   },
 ): VulnerabilityFinding {
   return {
-    id: fields.id ?? vulnerabilityId(fields.ruleId, fields.path, fields.startLine, fields.cve ?? ""),
+    id:
+      fields.id ?? vulnerabilityId(fields.ruleId, fields.path, fields.startLine, fields.cve ?? ""),
     ruleId: fields.ruleId,
     category: fields.category,
     severity: fields.severity,

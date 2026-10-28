@@ -40,9 +40,11 @@ export class SecurityPipeline {
   }
 }
 
-export function createDefaultSecurityPipeline(options: {
-  advisories?: AdvisoryDatabase;
-} = {}): SecurityPipeline {
+export function createDefaultSecurityPipeline(
+  options: {
+    advisories?: AdvisoryDatabase;
+  } = {},
+): SecurityPipeline {
   return new SecurityPipeline([
     sastScanner(),
     dependencyScanner(options.advisories),

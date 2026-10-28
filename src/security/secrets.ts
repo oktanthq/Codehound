@@ -1,10 +1,6 @@
 import type { VulnerabilityScanner } from "./architecture.js";
 import { sourceLines, stripQuotes } from "./text.js";
-import {
-  makeVulnerability,
-  type SecurityScanContext,
-  type VulnerabilityFinding,
-} from "./types.js";
+import { makeVulnerability, type SecurityScanContext, type VulnerabilityFinding } from "./types.js";
 
 const PLACEHOLDER =
   /^(changeme|change-me|placeholder|your[_-]?api[_-]?key|xxx+|todo|example|sample|dummy|secret|password|token)$/i;
@@ -133,7 +129,8 @@ export class SecretScanner implements VulnerabilityScanner {
               ruleId: "secret.hardcoded",
               severity: "critical",
               title: "Hardcoded credential",
-              message: "Sensitive value is assigned a string literal rather than an environment variable.",
+              message:
+                "Sensitive value is assigned a string literal rather than an environment variable.",
               path,
               startLine: line.line,
               evidence: line.text.trim(),

@@ -1,10 +1,6 @@
 import type { VulnerabilityScanner } from "./architecture.js";
 import { collectTaint, taintFromAnalysis } from "./taint.js";
-import {
-  makeVulnerability,
-  type SecurityScanContext,
-  type VulnerabilityFinding,
-} from "./types.js";
+import { makeVulnerability, type SecurityScanContext, type VulnerabilityFinding } from "./types.js";
 
 export class DataflowScanner implements VulnerabilityScanner {
   readonly id = "dataflow";
@@ -32,9 +28,7 @@ export class DataflowScanner implements VulnerabilityScanner {
             startLine: sink.line,
             evidence: sink.text.trim(),
             cwe: sink.cwe,
-            trace: collected.sources.map(
-              (source) => `${path}:${source.line}:${source.kind}`,
-            ),
+            trace: collected.sources.map((source) => `${path}:${source.line}:${source.kind}`),
           }),
         );
       }

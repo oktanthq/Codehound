@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { securityContext } from "../../src/security/architecture.js";
-import {
-  classifyVulnerabilities,
-  scoreVulnerability,
-} from "../../src/security/severity.js";
+import { classifyVulnerabilities, scoreVulnerability } from "../../src/security/severity.js";
 import { makeVulnerability } from "../../src/security/types.js";
 
 describe("vulnerability severity classification", () => {

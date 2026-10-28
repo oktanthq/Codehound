@@ -29,7 +29,12 @@ export const TAINT_SINK_PATTERNS: {
   cwe: string;
   pattern: RegExp;
 }[] = [
-  { id: "eval", title: "Dynamic evaluation", cwe: "CWE-95", pattern: /\beval\s*\(|\bnew\s+Function\s*\(/ },
+  {
+    id: "eval",
+    title: "Dynamic evaluation",
+    cwe: "CWE-95",
+    pattern: /\beval\s*\(|\bnew\s+Function\s*\(/,
+  },
   {
     id: "exec",
     title: "Command execution",
@@ -52,7 +57,8 @@ export const TAINT_SINK_PATTERNS: {
     id: "path",
     title: "Filesystem sink",
     cwe: "CWE-22",
-    pattern: /\b(readFileSync|writeFileSync|readFile|writeFile|createReadStream|createWriteStream)\s*\(/,
+    pattern:
+      /\b(readFileSync|writeFileSync|readFile|writeFile|createReadStream|createWriteStream)\s*\(/,
   },
 ];
 

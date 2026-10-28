@@ -5,9 +5,7 @@ import { classifyFindings } from "../review/severity.js";
 import { summarizeReview } from "../review/summary.js";
 import type { VulnerabilityFinding } from "./types.js";
 
-export function toReviewFindings(
-  findings: readonly VulnerabilityFinding[],
-): ReviewFinding[] {
+export function toReviewFindings(findings: readonly VulnerabilityFinding[]): ReviewFinding[] {
   return findings.map((finding) =>
     makeFinding({
       id: finding.id,
