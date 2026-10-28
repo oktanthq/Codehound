@@ -90,6 +90,20 @@ Work happens on the `dev` branch.
 - OKT-104 Implement change impact analysis
 - OKT-105 Implement generated-change validation
 - OKT-106 Integrate remediation suggestions into PR review
+- OKT-107 Design Codehound security analysis architecture
+- OKT-108 Implement SAST rules engine
+- OKT-109 Implement dependency vulnerability scanning
+- OKT-110 Implement secret and sensitive-data detection
+- OKT-111 Implement authentication/authorization analysis
+- OKT-112 Implement data-flow security analysis
+- OKT-113 Implement injection-path detection
+- OKT-114 Implement insecure API usage detection
+- OKT-115 Implement security business-rule analysis
+- OKT-116 Implement cross-component vulnerability tracing
+- OKT-117 Implement vulnerability severity classification
+- OKT-118 Implement vulnerability remediation suggestions
+- OKT-119 Integrate security findings into PR reviews
+- OKT-120 Build security-analysis evaluation benchmarks
 
 GitHub Integration is complete (OKT-21 through OKT-31). OKT-30 is archived and duplicates OKT-31, so it was not implemented separately.
 
@@ -105,10 +119,12 @@ Intelligent PR Review is complete (OKT-81 through OKT-94). Detectors and GitHub 
 
 Intelligent Code-Change Suggestions is complete (OKT-95 through OKT-106). Edits are local rewrites behind `generateSuggestions`; there is no hosted generation API. No archived duplicates were skipped in OKT-85 through OKT-106.
 
+Vulnerability Assessment is complete (OKT-107 through OKT-120). Dependency advisories use `AdvisoryDatabase` / `LocalAdvisoryDatabase` (curated npm ranges). SAST, taint, secrets, and remediations are local. No archived duplicates were skipped in OKT-107 through OKT-120.
+
 ## Partial
 
 None.
 
 ## Next
 
-- OKT-107 Design Codehound security analysis architecture
+Linear milestones through Vulnerability Assessment are implemented. Remaining work is swapping local interfaces for hosted backends (see README).

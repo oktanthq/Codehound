@@ -4,9 +4,24 @@ Codehound is an AI-powered code intelligence engine. It combines retrieval-augme
 
 It analyzes repositories to extract ASTs, dependencies, call graphs, component relationships, data flows, architecture, and business rules. That model is exposed to coding agents through MCP and used for context-aware PR reviews, code-change suggestions, and vulnerability assessment.
 
+## System overview
+
+The engine is a TypeScript library. Callers import from the package root (or a module under `src/`) rather than talking to GitHub, parsers, embeddings, or vulnerability feeds directly.
+
+1. **GitHub integration** (`src/github`) authenticates as a GitHub App, discovers and authorizes repositories, clones or incrementally updates worktrees, tracks branches, and handles webhooks.
+2. **Code analysis** (`src/analysis`) runs language adapters over ingested files. The TypeScript/JavaScript adapter uses the compiler API to extract symbols, imports, calls, types, HTTP endpoints, data flow, and components.
+3. **RAG** (`src/rag`) chunks those documents, embeds them, and retrieves with semantic search, BM25, and hybrid reciprocal-rank fusion.
+4. **CIM** (`src/cim`) turns an analysis run into a versioned entity/relation graph (files, symbols, components, layers, rules) with a query layer for impact analysis.
+5. **MCP server** (`src/mcp`) exposes that graph and retrieval over JSON-RPC 2.0 stdio as `codehound_*` tools.
+6. **PR review** (`src/review`) ingests a pull request, scans the diff, classifies findings, and can publish a GitHub review.
+7. **Change suggestions** (`src/suggestions`) map findings to local rewrites, emit unified diffs, and validate them against dependency, architecture, and rule guards.
+8. **Vulnerability assessment** (`src/security`) runs a pipeline of scanners (SAST, dependency advisories, secrets, auth, taint/data-flow, injection, insecure APIs, security rules, cross-component tracing), classifies severity, suggests remediations, and merges findings into PR reviews.
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for layout and design rules, and [docs/PROGRESS.md](docs/PROGRESS.md) for completed issues.
+
 ## Stack
 
-TypeScript on Node.js 20+. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for why this stack was chosen and how the system is laid out.
+TypeScript on Node.js 20+. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for why this stack was chosen.
 
 ## Requirements
 
@@ -20,7 +35,7 @@ npm install
 cp .env.example .env
 ```
 
-Fill GitHub App credentials in `.env`. Credentials are read from the environment only; never commit secrets.
+Fill GitHub App credentials in `.env` for live GitHub calls. Credentials are read from the environment only; never commit secrets. Tests mock HTTP and do not need a real App.
 
 | Variable                    | Required | Purpose                                      |
 | --------------------------- | -------- | -------------------------------------------- |
@@ -46,6 +61,22 @@ npm run format:check
 npm run build       # emit dist/ (not required to run tests)
 ```
 
+## Interfaces that still need hosted backends
+
+These seams are implemented locally so the library and tests run without external credentials. Swap the implementation; keep the type.
+
+| Interface                          | Local implementation                                               | Hosted backend when credentials exist                |
+| ---------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------- |
+| `Embedder`                         | `HashingEmbedder`                                                  | Remote embedding API                                 |
+| `VectorStore`                      | `InMemoryVectorStore`                                              | Hosted vector index                                  |
+| `CimStore`                         | `InMemoryCimStore`                                                 | Postgres (or equivalent)                             |
+| `AnalysisStore`                    | `InMemoryAnalysisStore`                                            | Durable analysis store                               |
+| `AdvisoryDatabase`                 | `LocalAdvisoryDatabase`                                            | OSV, GitHub Advisory, or similar feed                |
+| GitHub HTTP client                 | Mocked `fetch` in tests                                            | Live GitHub App installation tokens                  |
+| Change / remediation generation    | Local line rewrites (`generateSuggestions`, `suggestRemediations`) | Hosted generation API                                |
+| Metadata / selection / pull stores | In-memory maps                                                     | Durable repository metadata                          |
+| Language adapters                  | TypeScript and JavaScript                                          | Additional language workers behind `LanguageAdapter` |
+
 ## Status
 
-Work is tracked in Linear. Completed issues are listed in [docs/PROGRESS.md](docs/PROGRESS.md).
+Linear milestones through Vulnerability Assessment (OKT-21 through OKT-120) are implemented on `dev`. OKT-30 is an archived duplicate of OKT-31 and was skipped. Completed issues are listed in [docs/PROGRESS.md](docs/PROGRESS.md).
