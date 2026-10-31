@@ -33,6 +33,7 @@ export type Advisory = {
   packageName: string;
   ecosystem: "npm";
   vulnerableRange: string;
+  patchedVersion: string | undefined;
   severity: VulnerabilityFinding["severity"];
   cve: string | undefined;
   cwe: string | undefined;

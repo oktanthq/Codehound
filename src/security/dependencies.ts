@@ -344,6 +344,7 @@ export class DependencyScanner implements VulnerabilityScanner {
             cve: advisory.cve,
             packageName: pkg.name,
             packageVersion: pkg.version,
+            patchedVersion: advisory.patchedVersion,
           }),
         );
       }
