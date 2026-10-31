@@ -34,6 +34,7 @@ export type VulnerabilityFinding = {
   cve: string | undefined;
   packageName: string | undefined;
   packageVersion: string | undefined;
+  patchedVersion: string | undefined;
   trace: string[] | undefined;
 };
 
@@ -77,6 +78,7 @@ export function makeVulnerability(
     | "cve"
     | "packageName"
     | "packageVersion"
+    | "patchedVersion"
     | "trace"
   > & {
     id?: string;
@@ -87,6 +89,7 @@ export function makeVulnerability(
     cve?: string | undefined;
     packageName?: string | undefined;
     packageVersion?: string | undefined;
+    patchedVersion?: string | undefined;
     trace?: string[] | undefined;
   },
 ): VulnerabilityFinding {
@@ -106,6 +109,7 @@ export function makeVulnerability(
     cve: fields.cve,
     packageName: fields.packageName,
     packageVersion: fields.packageVersion,
+    patchedVersion: fields.patchedVersion,
     trace: fields.trace,
   };
 }

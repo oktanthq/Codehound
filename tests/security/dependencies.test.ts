@@ -30,6 +30,9 @@ describe("dependency vulnerability scanning", () => {
     expect(findings.find((finding) => finding.packageName === "lodash")?.cve).toBe(
       "CVE-2021-23337",
     );
+    expect(findings.find((finding) => finding.packageName === "lodash")?.patchedVersion).toBe(
+      "4.17.21",
+    );
   });
 
   it("falls back to package.json when no lockfile is present", () => {
