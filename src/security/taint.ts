@@ -79,12 +79,15 @@ function identifierMentions(text: string, names: ReadonlySet<string>): boolean {
   return false;
 }
 
-export function collectTaint(content: string): {
+export function collectTaint(
+  content: string,
+  extraTainted: ReadonlySet<string> = new Set(),
+): {
   tainted: Set<string>;
   sources: TaintSourceHit[];
   sinks: TaintSinkHit[];
 } {
-  const tainted = new Set<string>();
+  const tainted = new Set(extraTainted);
   const sources: TaintSourceHit[] = [];
   const sinks: TaintSinkHit[] = [];
 
