@@ -1,3 +1,5 @@
+import { extractImportBindings, type ImportBinding } from "../analysis/imports.js";
+import { parseTypeScript } from "../analysis/parse.js";
 import type { VulnerabilityScanner } from "./architecture.js";
 import { isCodeComment, sourceLines } from "./text.js";
 import {
@@ -14,7 +16,7 @@ export type SastRule = {
   severity: VulnSeverity;
   cwe: string | undefined;
   languages: readonly string[] | undefined;
-  match: (line: string, path: string) => boolean;
+  match: (line: string, path: string, content?: string) => boolean;
 };
 
 function patternRule(
@@ -36,6 +38,121 @@ function patternRule(
   };
 }
 
+const CHILD_PROCESS_MODULES = new Set(["child_process", "node:child_process"]);
+const CHILD_PROCESS_COMMANDS = [
+  "exec",
+  "execSync",
+  "execFile",
+  "execFileSync",
+  "spawn",
+  "spawnSync",
+  "fork",
+] as const;
+const BARE_IMPORTED_COMMANDS = new Set([
+  "exec",
+  "execSync",
+  "execFile",
+  "execFileSync",
+  "spawnSync",
+]);
+const MEMBER_COMMANDS = CHILD_PROCESS_COMMANDS.join("|");
+const DISTINCTIVE_COMMAND = /\b(execSync|execFileSync|spawnSync|execFile)\s*\(/;
+const BARE_EXEC = /(?<![\w.])exec\s*\(/;
+const REQUIRE_CHILD_PROCESS_CALL =
+  /require\s*\(\s*['"](?:node:)?child_process['"]\s*\)\s*\.\s*[A-Za-z_$][\w$]*\s*\(/;
+const CHILD_PROCESS_MEMBER_CALL = /\bchild_process\s*\.\s*[A-Za-z_$][\w$]*\s*\(/;
+const CP_ALIAS_CALL = new RegExp(`\\bcp\\s*\\.\\s*(?:${MEMBER_COMMANDS})\\s*\\(`);
+
+type ChildProcessBindings = {
+  commands: ReadonlySet<string>;
+  modules: ReadonlySet<string>;
+};
+
+type BindingsCache = {
+  path: string;
+  content: string;
+  bindings: ChildProcessBindings;
+};
+
+let bindingsCache: BindingsCache | undefined;
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function isChildProcessModule(source: string): boolean {
+  return CHILD_PROCESS_MODULES.has(source);
+}
+
+function bindingsFromImports(imports: readonly ImportBinding[]): ChildProcessBindings {
+  const commands = new Set<string>();
+  const modules = new Set<string>(["child_process"]);
+  for (const binding of imports) {
+    if (!isChildProcessModule(binding.source)) {
+      continue;
+    }
+    if (binding.imported === "*" || binding.imported === "default") {
+      modules.add(binding.local);
+    } else if (BARE_IMPORTED_COMMANDS.has(binding.imported)) {
+      commands.add(binding.local);
+    }
+  }
+  return { commands, modules };
+}
+
+function commandExecBindings(path: string, content: string): ChildProcessBindings {
+  const language = languageOf(path);
+  if (language === undefined || content.length === 0) {
+    return { commands: new Set(), modules: new Set(["child_process"]) };
+  }
+  const parsed = parseTypeScript(path, content, language);
+  return bindingsFromImports(extractImportBindings(parsed.sourceFile));
+}
+
+function cachedCommandExecBindings(path: string, content: string): ChildProcessBindings {
+  if (
+    bindingsCache !== undefined &&
+    bindingsCache.path === path &&
+    bindingsCache.content === content
+  ) {
+    return bindingsCache.bindings;
+  }
+  const bindings = commandExecBindings(path, content);
+  bindingsCache = { path, content, bindings };
+  return bindings;
+}
+
+function commandExecFallback(line: string): boolean {
+  return (
+    DISTINCTIVE_COMMAND.test(line) ||
+    BARE_EXEC.test(line) ||
+    REQUIRE_CHILD_PROCESS_CALL.test(line) ||
+    CHILD_PROCESS_MEMBER_CALL.test(line) ||
+    CP_ALIAS_CALL.test(line)
+  );
+}
+
+function commandExecFromBindings(line: string, bindings: ChildProcessBindings): boolean {
+  for (const name of bindings.commands) {
+    if (new RegExp(`(?<![\\w.])${escapeRegExp(name)}\\s*\\(`).test(line)) {
+      return true;
+    }
+  }
+  for (const name of bindings.modules) {
+    if (new RegExp(`\\b${escapeRegExp(name)}\\s*\\.\\s*(?:${MEMBER_COMMANDS})\\s*\\(`).test(line)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function matchesCommandExec(line: string, path: string, content = ""): boolean {
+  if (commandExecFallback(line)) {
+    return true;
+  }
+  return commandExecFromBindings(line, cachedCommandExecBindings(path, content));
+}
+
 export const BUILTIN_SAST_RULES: SastRule[] = [
   patternRule(
     "sast.eval",
@@ -53,14 +170,15 @@ export const BUILTIN_SAST_RULES: SastRule[] = [
     "CWE-79",
     /\.(innerHTML|outerHTML)\s*=|\bdangerouslySetInnerHTML\b|\bdocument\.write\s*\(/,
   ),
-  patternRule(
-    "sast.command-exec",
-    "OS command execution",
-    "Code shells out via child_process exec/spawn.",
-    "high",
-    "CWE-78",
-    /\b(execSync|execFileSync|spawnSync|execFile)\s*\(|\bchild_process\b|\bexec\s*\(/,
-  ),
+  {
+    id: "sast.command-exec",
+    title: "OS command execution",
+    message: "Code shells out via child_process exec/spawn.",
+    severity: "high",
+    cwe: "CWE-78",
+    languages: undefined,
+    match: matchesCommandExec,
+  },
   patternRule(
     "sast.proto-pollution",
     "Prototype pollution sink",
@@ -129,7 +247,7 @@ export class SastRulesEngine implements VulnerabilityScanner {
         ) {
           continue;
         }
-        if (!rule.match(line.text, path)) {
+        if (!rule.match(line.text, path, content)) {
           continue;
         }
         findings.push(

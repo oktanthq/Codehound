@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractImports } from "../../src/analysis/imports.js";
+import { extractImportBindings, extractImports } from "../../src/analysis/imports.js";
 import { parseTypeScript } from "../../src/analysis/parse.js";
 
 describe("extractImports", () => {
@@ -20,6 +20,27 @@ const loaded = import("./load.js");
       { source: "node:util", kind: "require" },
       { source: "typescript", kind: "require" },
       { source: "./load.js", kind: "dynamic" },
+    ]);
+  });
+
+  it("extracts local bindings for named, namespace, require, and member imports", () => {
+    const source = `
+import { exec, spawn as run } from "node:child_process";
+import cp from "child_process";
+import * as proc from "child_process";
+const required = require("child_process");
+const { execFile } = require("child_process");
+const execSync = require("child_process").execSync;
+`;
+    const parsed = parseTypeScript("src/bindings.ts", source, "TypeScript");
+    expect(extractImportBindings(parsed.sourceFile)).toEqual([
+      { source: "node:child_process", kind: "import", local: "exec", imported: "exec" },
+      { source: "node:child_process", kind: "import", local: "run", imported: "spawn" },
+      { source: "child_process", kind: "import", local: "cp", imported: "default" },
+      { source: "child_process", kind: "import", local: "proc", imported: "*" },
+      { source: "child_process", kind: "require", local: "required", imported: "*" },
+      { source: "child_process", kind: "require", local: "execFile", imported: "execFile" },
+      { source: "child_process", kind: "require", local: "execSync", imported: "execSync" },
     ]);
   });
 });
