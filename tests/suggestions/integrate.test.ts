@@ -38,6 +38,7 @@ describe("suggestion integration with PR review", () => {
           ]),
         ],
         commits: [],
+        truncated: false,
       },
     });
     const suggestions = generateSuggestions({

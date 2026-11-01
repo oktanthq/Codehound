@@ -2,6 +2,7 @@ import type { GitHubApp } from "./app.js";
 import type { RepositoryAuthorizer } from "./authz.js";
 import { systemClock, type Clock } from "./clock.js";
 import { GitHubAppError } from "./errors.js";
+import { DEFAULT_PAGE_SIZE, MAX_PAGES, paginate } from "./paginate.js";
 import { parseRepositoryFullName } from "./types.js";
 
 export const ZERO_SHA = "0".repeat(40);
@@ -163,7 +164,7 @@ export class BranchTracker {
     options: BranchTrackerOptions = {},
   ) {
     this.clock = options.clock ?? systemClock;
-    this.pageSize = options.pageSize ?? 100;
+    this.pageSize = options.pageSize ?? DEFAULT_PAGE_SIZE;
   }
 
   async getBranch(
@@ -302,20 +303,19 @@ export class BranchTracker {
     owner: string,
     name: string,
   ): Promise<GitHubBranchPayload[]> {
-    const branches: GitHubBranchPayload[] = [];
-    for (let page = 1; page <= 100; page += 1) {
-      const result = await this.app.requestAsInstallation<GitHubBranchPayload[]>(installationId, {
-        method: "GET",
-        path: `/repos/${owner}/${name}/branches`,
-        query: { per_page: this.pageSize, page },
-      });
-      const batch = result.data ?? [];
-      branches.push(...batch);
-      if (batch.length === 0 || batch.length < this.pageSize) {
-        break;
-      }
-    }
-    return branches;
+    const paged = await paginate({
+      pageSize: this.pageSize,
+      maxPages: MAX_PAGES,
+      fetchPage: async (page, pageSize) => {
+        const result = await this.app.requestAsInstallation<GitHubBranchPayload[]>(installationId, {
+          method: "GET",
+          path: `/repos/${owner}/${name}/branches`,
+          query: { per_page: pageSize, page },
+        });
+        return { items: result.data ?? [], headers: result.headers };
+      },
+    });
+    return paged.items;
   }
 
   private async listNewCommits(
@@ -325,26 +325,28 @@ export class BranchTracker {
     stopSha: string | undefined,
   ): Promise<TrackedCommit[]> {
     const { owner, name } = parseRepositoryFullName(fullName);
-    const collected: TrackedCommit[] = [];
-    for (let page = 1; page <= 20; page += 1) {
-      const result = await this.app.requestAsInstallation<GitHubCommitPayload[]>(installationId, {
-        method: "GET",
-        path: `/repos/${owner}/${name}/commits`,
-        query: { sha: branchName, per_page: this.pageSize, page },
-      });
-      const batch = result.data ?? [];
-      let reachedStop = false;
-      for (const payload of batch) {
-        if (stopSha !== undefined && payload.sha === stopSha) {
-          reachedStop = true;
-          break;
+    const paged = await paginate({
+      pageSize: this.pageSize,
+      maxPages: 20,
+      fetchPage: async (page, pageSize) => {
+        const result = await this.app.requestAsInstallation<GitHubCommitPayload[]>(installationId, {
+          method: "GET",
+          path: `/repos/${owner}/${name}/commits`,
+          query: { sha: branchName, per_page: pageSize, page },
+        });
+        const batch = result.data ?? [];
+        const items: TrackedCommit[] = [];
+        let done = false;
+        for (const payload of batch) {
+          if (stopSha !== undefined && payload.sha === stopSha) {
+            done = true;
+            break;
+          }
+          items.push(mapGitHubCommit(payload));
         }
-        collected.push(mapGitHubCommit(payload));
-      }
-      if (reachedStop || batch.length === 0 || batch.length < this.pageSize) {
-        break;
-      }
-    }
-    return collected;
+        return { items, headers: result.headers, done };
+      },
+    });
+    return paged.items;
   }
 }

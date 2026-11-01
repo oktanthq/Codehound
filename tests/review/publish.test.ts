@@ -92,6 +92,7 @@ describe("GitHub PR review integration", () => {
       },
       files: [addedFile("src/bad.ts", ["eval(x);"])],
       commits: [],
+      truncated: false,
     };
     const report = reviewPull({ pull });
     const published = await new GitHubReviewPublisher(

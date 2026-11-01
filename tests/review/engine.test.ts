@@ -25,6 +25,7 @@ describe("review engine", () => {
         },
         files: [addedFile("src/bad.ts", ["eval(x);", "console.log(x);"])],
         commits: [],
+        truncated: false,
       },
     });
     expect(report.findings.some((finding) => finding.ruleId === "security.eval")).toBe(true);
