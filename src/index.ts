@@ -13,6 +13,7 @@ export {
   InMemoryRefStore,
   WebhookHandler,
   loadGitHubAppConfig,
+  loadWebhookServerConfig,
   createGitHubAppJwt,
   InstallationTokenClient,
   detectFile,
@@ -86,6 +87,16 @@ export {
   attachSuggestionsToReport,
   unifiedDiff,
 } from "./suggestions/index.js";
+
+export {
+  GITHUB_WEBHOOK_PATH,
+  closeServer,
+  createGitHubWebhookServer,
+  createPullRequestDispatcher,
+  createWebhookRuntime,
+  listenServer,
+  startWebhookServerFromEnv,
+} from "./server/index.js";
 
 export {
   createDefaultSecurityPipeline,

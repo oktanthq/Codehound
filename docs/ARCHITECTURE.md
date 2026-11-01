@@ -26,6 +26,7 @@ src/
   cim/                  project model / ontology (OKT-55+)
   mcp/                  MCP project intelligence server (OKT-69+)
   review/               PR review (OKT-81+)
+  server/               HTTP webhook listener (`POST /webhooks/github`)
   suggestions/          code-change suggestions (OKT-95+)
   security/             vulnerability assessment (OKT-107+)
 tests/                  vitest suites mirroring src/
@@ -46,7 +47,7 @@ GitHub access is installation-based, not personal-access-token-based.
 5. **Discovery** lists installation repositories, with filters, and records which repos are selected for analysis.
 6. **Ingest** clones a selected, authorized repository into a local worktree and records a snapshot (ref, SHA, files) for later analysis.
 7. **Branch tracking** records branch heads and commits (from the GitHub API or from webhook payloads) and the last ingested SHA per branch.
-8. **Webhooks** verify `X-Hub-Signature-256`, parse GitHub events, and update branch tracking for push/delete.
+8. **Webhooks** verify `X-Hub-Signature-256`, parse GitHub events, and update branch tracking for push/delete. `src/server/webhooks.ts` is the HTTP listener (`codehound serve` / `npm start`): `POST /webhooks/github` returns 401 on a bad signature, 202 on accepted or duplicate deliveries, and dispatches `pull_request` events to ingestion and review.
 9. **Incremental ingest** fast-forwards an existing worktree when the new commit is a descendant of the last ingest; otherwise it reclones. Push webhooks drive this path.
 10. **Language detection** classifies each ingested file (extension, filename, shebang) and records a language inventory plus a primary language.
 11. **Metadata storage** keeps repository and per-commit version records (languages, files, SHAs) behind a store interface; the in-memory implementation is for tests and early local use.

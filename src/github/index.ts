@@ -1,7 +1,12 @@
 export { GitHubApi } from "./api.js";
 export { GitHubApp } from "./app.js";
 export { RepositoryAuthorizer } from "./authz.js";
-export { loadGitHubAppConfig, normalizePrivateKey } from "./config.js";
+export {
+  DEFAULT_WEBHOOK_PORT,
+  loadGitHubAppConfig,
+  loadWebhookServerConfig,
+  normalizePrivateKey,
+} from "./config.js";
 export { RepositoryDiscovery } from "./discovery.js";
 export { authenticatedCloneUrl, isFetchingGitCli, ProcessGitCli } from "./git.js";
 export { IncrementalIngestor } from "./incremental.js";
@@ -64,7 +69,7 @@ export type {
 export type { DetectedFile, FileKind, LanguageStat, LanguageSummary } from "./languages.js";
 export type { IngestRecord, MetadataStore, StoredRepository, StoredVersion } from "./metadata.js";
 export type { IngestedFile } from "./walk.js";
-export type { EnvMap } from "./config.js";
+export type { EnvMap, WebhookServerConfig } from "./config.js";
 export type { SelectionLookup, SelectionStore } from "./selection.js";
 export type { GitHubErrorCode } from "./errors.js";
 export type { Clock } from "./clock.js";
