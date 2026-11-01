@@ -2,7 +2,7 @@ export { detectArchitectureViolations } from "./architecture.js";
 export { commentsFromFindings, formatFindingComment } from "./comments.js";
 export { retrieveChangedCodeContext } from "./context.js";
 export { analyzePullDiff, lineNumbers, parsePatch } from "./diff.js";
-export { collectFindings, reviewPull } from "./engine.js";
+export { collectFindings, reviewPull, reviewPullWithContext } from "./engine.js";
 export { addedLinesOf, deletedLinesOf, findingId, makeFinding } from "./findings.js";
 export { analyzePullImpact } from "./impact.js";
 export { mapPullCommit, mapPullFile, mapPullPayload, PullRequestIngestor } from "./ingest.js";
