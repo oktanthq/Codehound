@@ -76,6 +76,9 @@ describe("review engine", () => {
           addedLines: [1],
           hits: [relatedHit("src/index.ts", 4)],
         },
+        files: [addedFile("src/bad.ts", ["eval(x);", "console.log(x);"])],
+        commits: [],
+        truncated: false,
       ],
       pull: {
         ...pull,

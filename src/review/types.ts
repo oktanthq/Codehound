@@ -35,6 +35,7 @@ export type IngestedPull = {
   files: PullFile[];
   commits: PullCommit[];
   ingestedAt: string;
+  truncated: boolean;
 };
 
 export type DiffLineKind = "context" | "add" | "del";
