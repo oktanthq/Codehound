@@ -67,6 +67,7 @@ describe("dependency vulnerability scanning", () => {
         cwe: "CWE-94",
         title: "Prototype pollution across lodash majors",
         url: "https://github.com/advisories/GHSA-union",
+        patchedVersion: "2.0.0",
       },
     ];
     const db = new LocalAdvisoryDatabase(advisories);

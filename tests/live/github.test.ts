@@ -173,6 +173,7 @@ describe("live GitHub App", () => {
         impact: [],
         findings: [],
         comments: [],
+        codeContext: [],
         summary: {
           title: "Codehound live test",
           body: "Codehound live integration test review.",
