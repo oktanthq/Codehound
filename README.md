@@ -35,7 +35,9 @@ npm install
 cp .env.example .env
 ```
 
-Fill GitHub App credentials in `.env` for live GitHub calls. Credentials are read from the environment only; never commit secrets. Tests mock HTTP and do not need a real App.
+Fill GitHub App credentials in `.env` for live GitHub calls. Credentials are read from the environment only; never commit secrets. Tests inject a scripted `HttpClient` (`MockHttp` in `tests/helpers/http.ts`) and do not need a real App. The default suite does not exercise `createFetchHttpClient`, the `fetch` transport.
+
+GitHub calls go through the `HttpClient` interface. To cover a new GitHub route in tests, register it on `MockHttp` with `.on({ method, urlIncludes, body })`. Routes match by HTTP method and a URL substring; unmatched routes return 404. `http.calls` records every request.
 
 | Variable                    | Required | Purpose                                      |
 | --------------------------- | -------- | -------------------------------------------- |
@@ -65,17 +67,17 @@ npm run build       # emit dist/ (not required to run tests)
 
 These seams are implemented locally so the library and tests run without external credentials. Swap the implementation; keep the type.
 
-| Interface                          | Local implementation                                               | Hosted backend when credentials exist                |
-| ---------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------- |
-| `Embedder`                         | `HashingEmbedder`                                                  | Remote embedding API                                 |
-| `VectorStore`                      | `InMemoryVectorStore`                                              | Hosted vector index                                  |
-| `CimStore`                         | `InMemoryCimStore`                                                 | Postgres (or equivalent)                             |
-| `AnalysisStore`                    | `InMemoryAnalysisStore`                                            | Durable analysis store                               |
-| `AdvisoryDatabase`                 | `LocalAdvisoryDatabase`                                            | OSV, GitHub Advisory, or similar feed                |
-| GitHub HTTP client                 | Mocked `fetch` in tests                                            | Live GitHub App installation tokens                  |
-| Change / remediation generation    | Local line rewrites (`generateSuggestions`, `suggestRemediations`) | Hosted generation API                                |
-| Metadata / selection / pull stores | In-memory maps                                                     | Durable repository metadata                          |
-| Language adapters                  | TypeScript and JavaScript                                          | Additional language workers behind `LanguageAdapter` |
+| Interface                          | Local implementation                                                 | Hosted backend when credentials exist                |
+| ---------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- |
+| `Embedder`                         | `HashingEmbedder`                                                    | Remote embedding API                                 |
+| `VectorStore`                      | `InMemoryVectorStore`                                                | Hosted vector index                                  |
+| `CimStore`                         | `InMemoryCimStore`                                                   | Postgres (or equivalent)                             |
+| `AnalysisStore`                    | `InMemoryAnalysisStore`                                              | Durable analysis store                               |
+| `AdvisoryDatabase`                 | `LocalAdvisoryDatabase`                                              | OSV, GitHub Advisory, or similar feed                |
+| GitHub HTTP client                 | Scripted `HttpClient` (`MockHttp`, `tests/helpers/http.ts`) in tests | Live GitHub App installation tokens                  |
+| Change / remediation generation    | Local line rewrites (`generateSuggestions`, `suggestRemediations`)   | Hosted generation API                                |
+| Metadata / selection / pull stores | In-memory maps                                                       | Durable repository metadata                          |
+| Language adapters                  | TypeScript and JavaScript                                            | Additional language workers behind `LanguageAdapter` |
 
 ## Status
 
