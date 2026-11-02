@@ -1,3 +1,4 @@
+import type { ChangedCodeContext } from "./context.js";
 import { SEVERITIES, type ReviewFinding, type ReviewSeverity } from "./findings.js";
 import { highestSeverity } from "./severity.js";
 import type { IngestedPull } from "./types.js";
@@ -37,9 +38,32 @@ export function reviewEventFor(findings: readonly ReviewFinding[]): ReviewEvent 
   return "COMMENT";
 }
 
+function relatedCodeLines(codeContext: readonly ChangedCodeContext[]): string[] {
+  const lines: string[] = [];
+  const seen = new Set<string>();
+  for (const item of codeContext) {
+    for (const hit of item.hits) {
+      if (hit.chunk.path === item.path) {
+        continue;
+      }
+      const location =
+        hit.chunk.symbol === undefined
+          ? `${hit.chunk.path}:${hit.chunk.startLine}`
+          : `${hit.chunk.path}:${hit.chunk.startLine} (${hit.chunk.symbol})`;
+      if (seen.has(location)) {
+        continue;
+      }
+      seen.add(location);
+      lines.push(`- ${location} - related to \`${item.path}\``);
+    }
+  }
+  return lines;
+}
+
 export function summarizeReview(
   findings: readonly ReviewFinding[],
   pull: IngestedPull | undefined = undefined,
+  codeContext: readonly ChangedCodeContext[] = [],
 ): ReviewSummary {
   const counts = countBySeverity(findings);
   const event = reviewEventFor(findings);
@@ -59,12 +83,14 @@ export function summarizeReview(
     .map((finding) => `- [${finding.severity}] ${finding.path}: ${finding.title}`);
   const pullLine =
     pull === undefined ? "" : `Pull request #${pull.pull.number} (${pull.pull.title})\n\n`;
+  const related = relatedCodeLines(codeContext);
   const body = [
     `# Codehound review`,
     "",
     pullLine + headline,
     "",
     top.length > 0 ? "## Top findings\n\n" + top.join("\n") : "No inline findings.",
+    ...(related.length > 0 ? ["", "## Related code", "", related.join("\n")] : []),
   ].join("\n");
   return {
     title: headline,

@@ -1,5 +1,6 @@
 import type { AnalyzedFileDiff, DiffLine } from "./types.js";
 import type { CimQueryLayer } from "../cim/query.js";
+import type { ChangedCodeContext } from "./context.js";
 import type { PullImpact } from "./impact.js";
 import type { IngestedPull } from "./types.js";
 
@@ -35,6 +36,7 @@ export type ReviewContext = {
   query: CimQueryLayer | undefined;
   files: Map<string, string>;
   pull: IngestedPull | undefined;
+  codeContext: ChangedCodeContext[];
 };
 
 export function findingId(ruleId: string, path: string, line: number | undefined): string {

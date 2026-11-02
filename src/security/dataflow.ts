@@ -13,10 +13,17 @@ export class DataflowScanner implements VulnerabilityScanner {
       }
       const collected = collectTaint(content);
       const document = context.analysis?.documents.find((item) => item.path === path);
-      if (document !== undefined) {
-        taintFromAnalysis(document, content);
-      }
-      for (const sink of collected.sinks) {
+      const effective =
+        document === undefined
+          ? collected
+          : collectTaint(content, taintFromAnalysis(document, content));
+      const trace = [
+        ...effective.sources.map((source) => `${path}:${source.line}:${source.kind}`),
+        ...[...effective.tainted]
+          .filter((name) => !collected.tainted.has(name))
+          .map((name) => `${path}:${name}`),
+      ];
+      for (const sink of effective.sinks) {
         findings.push(
           makeVulnerability({
             category: "dataflow",
@@ -28,7 +35,7 @@ export class DataflowScanner implements VulnerabilityScanner {
             startLine: sink.line,
             evidence: sink.text.trim(),
             cwe: sink.cwe,
-            trace: collected.sources.map((source) => `${path}:${source.line}:${source.kind}`),
+            trace,
           }),
         );
       }

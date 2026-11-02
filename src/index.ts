@@ -79,6 +79,7 @@ export {
   parsePatch,
   retrieveChangedCodeContext,
   reviewPull,
+  reviewPullWithContext,
 } from "./review/index.js";
 
 export {

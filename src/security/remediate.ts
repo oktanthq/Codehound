@@ -54,30 +54,124 @@ function rewriteLine(ruleId: string, line: string): string | undefined {
   return line;
 }
 
+const DEPENDENCY_SECTIONS = [
+  "dependencies",
+  "devDependencies",
+  "optionalDependencies",
+  "peerDependencies",
+] as const;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function detectIndent(text: string): string | number {
+  const match = /\n([ \t]+)"/.exec(text);
+  if (match?.[1] !== undefined) {
+    return match[1];
+  }
+  if (!text.includes("\n")) {
+    return 0;
+  }
+  return 2;
+}
+
+function serializeJson(value: unknown, original: string): string {
+  const serialized = JSON.stringify(value, null, detectIndent(original));
+  return original.endsWith("\n") ? `${serialized}\n` : serialized;
+}
+
+function rangeOperator(declared: string): string {
+  if (declared.startsWith("^") || declared.startsWith("~")) {
+    return declared.slice(0, 1);
+  }
+  return "";
+}
+
+function packageJsonPath(findingPath: string, files: Map<string, string>): string | undefined {
+  if (findingPath.endsWith("package.json") && files.has(findingPath)) {
+    return findingPath;
+  }
+  const slash = findingPath.lastIndexOf("/");
+  const sibling = `${slash === -1 ? "" : findingPath.slice(0, slash + 1)}package.json`;
+  if (files.has(sibling)) {
+    return sibling;
+  }
+  return undefined;
+}
+
+function declaredDependency(
+  manifest: Record<string, unknown>,
+  packageName: string,
+): { section: (typeof DEPENDENCY_SECTIONS)[number]; range: string } | undefined {
+  for (const section of DEPENDENCY_SECTIONS) {
+    const block = manifest[section];
+    if (!isRecord(block) || typeof block[packageName] !== "string") {
+      continue;
+    }
+    return { section, range: block[packageName] };
+  }
+  return undefined;
+}
+
+function dependencyAdvice(finding: VulnerabilityFinding): string {
+  const name = finding.packageName ?? "dependency";
+  const version = finding.packageVersion ?? "unknown";
+  const label = finding.cve ?? finding.ruleId;
+  if (finding.patchedVersion === undefined) {
+    return `Upgrade ${name}@${version} manually; no fixed version is known for ${label}`;
+  }
+  return `Upgrade transitive ${name}@${version} to ${finding.patchedVersion} (${label}); package is lockfile-only`;
+}
+
 function bumpDependency(
   finding: VulnerabilityFinding,
   files: Map<string, string>,
 ): SuggestionChange | undefined {
-  if (finding.packageName === undefined || finding.packageVersion === undefined) {
+  if (
+    finding.packageName === undefined ||
+    finding.packageVersion === undefined ||
+    finding.patchedVersion === undefined
+  ) {
     return undefined;
   }
-  const path = finding.path;
+  const path = packageJsonPath(finding.path, files);
+  if (path === undefined) {
+    return undefined;
+  }
   const current = files.get(path);
   if (current === undefined) {
     return undefined;
   }
-  const next = current.replaceAll(
-    `"${finding.packageName}": "${finding.packageVersion}"`,
-    `"${finding.packageName}": "${finding.packageVersion}" /* upgrade past ${finding.cve ?? finding.ruleId} */`,
-  );
+  let manifest: unknown;
+  try {
+    manifest = JSON.parse(current) as unknown;
+  } catch {
+    return undefined;
+  }
+  if (!isRecord(manifest)) {
+    return undefined;
+  }
+  const declared = declaredDependency(manifest, finding.packageName);
+  if (declared === undefined) {
+    return undefined;
+  }
+  const nextRange = `${rangeOperator(declared.range)}${finding.patchedVersion}`;
+  const block = manifest[declared.section];
+  if (!isRecord(block) || nextRange === declared.range) {
+    return undefined;
+  }
+  block[finding.packageName] = nextRange;
+  const next = serializeJson(manifest, current);
   if (next === current) {
     return undefined;
   }
+  const label = finding.cve ?? finding.ruleId;
   return {
     path,
     oldText: current,
     newText: next,
-    description: `Mark ${finding.packageName}@${finding.packageVersion} for upgrade`,
+    description: `Bump ${finding.packageName} from ${declared.range} to ${nextRange} (${label})`,
   };
 }
 
@@ -108,6 +202,26 @@ export function remediateFinding(
   };
 }
 
+function suggestionFromChange(
+  finding: VulnerabilityFinding,
+  change: SuggestionChange,
+): Suggestion | undefined {
+  const patch = unifiedDiff(change.path, change.oldText, change.newText);
+  if (patch.length === 0) {
+    return undefined;
+  }
+  return {
+    id: `remediate:${finding.id}`,
+    title: `Remediate ${finding.ruleId}`,
+    kind: "single-file",
+    findingId: finding.id,
+    changes: [change],
+    patch,
+    impactPaths: [change.path],
+    validation: { ok: true, problems: [] },
+  };
+}
+
 export function suggestRemediations(
   findings: readonly VulnerabilityFinding[],
   files: Map<string, string>,
@@ -115,21 +229,24 @@ export function suggestRemediations(
   const suggestions: Suggestion[] = [];
   for (const finding of findings) {
     const change = remediateFinding(finding, files);
-    if (change === undefined) {
+    if (change !== undefined) {
+      const suggestion = suggestionFromChange(finding, change);
+      if (suggestion !== undefined) {
+        suggestions.push(suggestion);
+      }
       continue;
     }
-    const patch = unifiedDiff(change.path, change.oldText, change.newText);
-    if (patch.length === 0) {
+    if (finding.category !== "dependency" || finding.packageName === undefined) {
       continue;
     }
     suggestions.push({
       id: `remediate:${finding.id}`,
-      title: `Remediate ${finding.ruleId}`,
+      title: dependencyAdvice(finding),
       kind: "single-file",
       findingId: finding.id,
-      changes: [change],
-      patch,
-      impactPaths: [change.path],
+      changes: [],
+      patch: "",
+      impactPaths: [finding.path],
       validation: { ok: true, problems: [] },
     });
   }
