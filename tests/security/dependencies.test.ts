@@ -55,6 +55,31 @@ describe("dependency vulnerability scanning", () => {
     expect(versionSatisfies("9.0.0", "<9.0.0")).toBe(false);
   });
 
+  it("flags advisory union ranges used by GitHub Advisory and OSV", async () => {
+    const advisories = [
+      {
+        id: "GHSA-union",
+        packageName: "lodash",
+        ecosystem: "npm" as const,
+        vulnerableRange: "<4.17.21 || >=5.0.0 <5.0.1",
+        severity: "high" as const,
+        cve: "CVE-2021-23337",
+        cwe: "CWE-94",
+        title: "Prototype pollution across lodash majors",
+        url: "https://github.com/advisories/GHSA-union",
+      },
+    ];
+    const db = new LocalAdvisoryDatabase(advisories);
+    expect(await db.lookup("lodash", "4.17.20")).toEqual([
+      expect.objectContaining({ id: "GHSA-union" }),
+    ]);
+    expect(await db.lookup("lodash", "5.0.0")).toEqual([
+      expect.objectContaining({ id: "GHSA-union" }),
+    ]);
+    expect(await db.lookup("lodash", "4.17.21")).toEqual([]);
+    expect(await db.lookup("lodash", "5.0.1")).toEqual([]);
+  });
+
   it("parses yarn classic lockfiles, including scoped names and multiple ranges", () => {
     const installed = parseInstalledPackages([
       {
