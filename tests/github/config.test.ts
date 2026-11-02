@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { loadGitHubAppConfig, normalizePrivateKey } from "../../src/github/config.js";
+import {
+  DEFAULT_WEBHOOK_PORT,
+  loadGitHubAppConfig,
+  loadWebhookServerConfig,
+  normalizePrivateKey,
+} from "../../src/github/config.js";
 import { GitHubAppError } from "../../src/github/errors.js";
 import { generateTestAppKeys } from "../helpers/keys.js";
 
@@ -49,5 +54,44 @@ describe("loadGitHubAppConfig", () => {
 
   it("rejects invalid private keys", () => {
     expect(() => normalizePrivateKey("not-a-key")).toThrow(GitHubAppError);
+  });
+});
+
+describe("loadWebhookServerConfig", () => {
+  it("requires a webhook secret and defaults the port", () => {
+    const keys = generateTestAppKeys();
+    expect(() =>
+      loadWebhookServerConfig({
+        GITHUB_APP_ID: "99",
+        GITHUB_APP_PRIVATE_KEY: keys.privateKeyPkcs8,
+      }),
+    ).toThrow(GitHubAppError);
+
+    const config = loadWebhookServerConfig({
+      GITHUB_APP_ID: "99",
+      GITHUB_APP_PRIVATE_KEY: keys.privateKeyPkcs8,
+      GITHUB_APP_WEBHOOK_SECRET: "hook",
+    });
+    expect(config.webhookSecret).toBe("hook");
+    expect(config.port).toBe(DEFAULT_WEBHOOK_PORT);
+  });
+
+  it("reads CODEHOUND_PORT and rejects an invalid port", () => {
+    const keys = generateTestAppKeys();
+    const config = loadWebhookServerConfig({
+      GITHUB_APP_ID: "99",
+      GITHUB_APP_PRIVATE_KEY: keys.privateKeyPkcs8,
+      GITHUB_APP_WEBHOOK_SECRET: "hook",
+      CODEHOUND_PORT: "4100",
+    });
+    expect(config.port).toBe(4100);
+    expect(() =>
+      loadWebhookServerConfig({
+        GITHUB_APP_ID: "99",
+        GITHUB_APP_PRIVATE_KEY: keys.privateKeyPkcs8,
+        GITHUB_APP_WEBHOOK_SECRET: "hook",
+        CODEHOUND_PORT: "nope",
+      }),
+    ).toThrow(GitHubAppError);
   });
 });

@@ -104,6 +104,7 @@ Work happens on the `dev` branch.
 - OKT-118 Implement vulnerability remediation suggestions
 - OKT-119 Integrate security findings into PR reviews
 - OKT-120 Build security-analysis evaluation benchmarks
+- OKT-144 Add a webhook server entry point and live GitHub integration tests
 
 GitHub Integration is complete (OKT-21 through OKT-31). OKT-30 is archived and duplicates OKT-31, so it was not implemented separately.
 
@@ -127,4 +128,4 @@ None.
 
 ## Next
 
-Linear milestones through Vulnerability Assessment are implemented. Remaining work is swapping local interfaces for hosted backends (see README).
+Linear milestones through Vulnerability Assessment are implemented. Remaining work is swapping local interfaces for hosted backends (see README). The webhook HTTP server and opt-in live GitHub suite land with OKT-144.

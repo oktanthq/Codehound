@@ -72,3 +72,30 @@ export function loadGitHubAppConfig(env: EnvMap = process.env): GitHubAppCredent
   }
   return credentials;
 }
+
+export const DEFAULT_WEBHOOK_PORT = 3000;
+
+export type WebhookServerConfig = GitHubAppCredentials & {
+  webhookSecret: string;
+  port: number;
+};
+
+export function loadWebhookServerConfig(env: EnvMap = process.env): WebhookServerConfig {
+  const credentials = loadGitHubAppConfig(env);
+  const webhookSecret = credentials.webhookSecret;
+  if (webhookSecret === undefined) {
+    throw new GitHubAppError(
+      "Missing required environment variable GITHUB_APP_WEBHOOK_SECRET",
+      "WEBHOOK_SECRET_MISSING",
+    );
+  }
+  const rawPort = readOptional(env, "CODEHOUND_PORT") ?? readOptional(env, "PORT");
+  const port = rawPort === undefined ? DEFAULT_WEBHOOK_PORT : Number.parseInt(rawPort, 10);
+  if (!Number.isInteger(port) || port < 0 || port > 65535) {
+    throw new GitHubAppError(
+      "CODEHOUND_PORT must be an integer between 0 and 65535",
+      "MISSING_CONFIG",
+    );
+  }
+  return { ...credentials, webhookSecret, port };
+}
