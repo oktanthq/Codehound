@@ -1,7 +1,25 @@
+import type { RetrievalHit } from "../rag/types.js";
 import { deletedLinesOf, makeFinding, type ReviewContext, type ReviewFinding } from "./findings.js";
 
 const EXPORTED = /export\s+(?:async\s+)?(?:function|const|class|type|interface)\s+(\w+)/;
 const FAN_IN = 2;
+
+function relatedHitsFor(context: ReviewContext, path: string): RetrievalHit[] {
+  const entry = context.codeContext.find((item) => item.path === path);
+  if (entry === undefined) {
+    return [];
+  }
+  return entry.hits.filter((hit) => hit.chunk.path !== path);
+}
+
+function formatRelated(hits: readonly RetrievalHit[]): string {
+  return hits
+    .map((hit) => {
+      const location = `${hit.chunk.path}:${hit.chunk.startLine}`;
+      return hit.chunk.symbol === undefined ? location : `${location} (${hit.chunk.symbol})`;
+    })
+    .join(", ");
+}
 
 function isTestPath(path: string): boolean {
   return path.startsWith("tests/") || path.includes(".test.") || path.includes(".spec.");
@@ -65,6 +83,22 @@ export function detectRegressionRisk(context: ReviewContext): ReviewFinding[] {
           title: "Test assertions removed",
           message: `${diff.path} deletes ${diff.deletedLines.length} lines without replacements.`,
           path: diff.path,
+        }),
+      );
+    }
+
+    const related = relatedHitsFor(context, diff.path);
+    if (related.length > 0) {
+      const locations = formatRelated(related);
+      findings.push(
+        makeFinding({
+          category: "regression",
+          ruleId: "regression.related-code",
+          severity: "medium",
+          title: "Related code may need updates",
+          message: `${diff.path} has related callers or similar code at ${locations}.`,
+          path: diff.path,
+          evidence: locations,
         }),
       );
     }

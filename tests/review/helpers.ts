@@ -1,3 +1,4 @@
+import type { RetrievalHit } from "../../src/rag/types.js";
 import { analyzePullDiff } from "../../src/review/diff.js";
 import type { ReviewContext } from "../../src/review/findings.js";
 import type { AnalyzedFileDiff, PullFile } from "../../src/review/types.js";
@@ -46,5 +47,31 @@ export function contextOf(files: PullFile[], extras: Partial<ReviewContext> = {}
     query: extras.query,
     files: extras.files ?? new Map(),
     pull: extras.pull,
+    codeContext: extras.codeContext ?? [],
+  };
+}
+
+export function relatedHit(
+  path: string,
+  startLine = 1,
+  symbol: string | undefined = "greet",
+): RetrievalHit {
+  return {
+    chunk: {
+      id: `${path}:${startLine}`,
+      path,
+      language: "TypeScript",
+      fileKind: "source",
+      kind: symbol === undefined ? "block" : "symbol",
+      symbol,
+      symbolKind: symbol === undefined ? undefined : "function",
+      startLine,
+      endLine: startLine,
+      text: symbol ?? path,
+      repositoryFullName: "oktant/demo",
+      commitSha: "abc",
+    },
+    score: 0.9,
+    source: "hybrid",
   };
 }
