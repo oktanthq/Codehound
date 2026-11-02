@@ -1,10 +1,14 @@
 import type { GitHubApp } from "../github/app.js";
 import type { RepositoryAuthorizer } from "../github/authz.js";
+import { systemClock, type Clock } from "../github/clock.js";
+import { DEFAULT_PAGE_SIZE, paginate } from "../github/paginate.js";
 import { parseRepositoryFullName } from "../github/types.js";
 import type { ParsedPullRequest } from "../github/webhooks.js";
-import { systemClock, type Clock } from "../github/clock.js";
 import type { PullStore } from "./store.js";
 import type { IngestedPull, PullCommit, PullFile, PullRef } from "./types.js";
+
+export const GITHUB_PR_FILES_LIMIT = 3000;
+export const GITHUB_PR_COMMITS_LIMIT = 250;
 
 export type PullIngestRequest = {
   installationId: number;
@@ -116,34 +120,51 @@ export class PullRequestIngestor {
         path: `/repos/${owner}/${name}/pulls/${request.number}`,
       },
     );
-    const filesResult = await this.app.requestAsInstallation<GitHubPullFilePayload[]>(
-      request.installationId,
-      {
-        method: "GET",
-        path: `/repos/${owner}/${name}/pulls/${request.number}/files`,
-        query: { per_page: 100 },
+    const filesPage = await paginate({
+      pageSize: DEFAULT_PAGE_SIZE,
+      maxPages: Math.ceil(GITHUB_PR_FILES_LIMIT / DEFAULT_PAGE_SIZE),
+      maxItems: GITHUB_PR_FILES_LIMIT,
+      fetchPage: async (page, pageSize) => {
+        const result = await this.app.requestAsInstallation<GitHubPullFilePayload[]>(
+          request.installationId,
+          {
+            method: "GET",
+            path: `/repos/${owner}/${name}/pulls/${request.number}/files`,
+            query: { per_page: pageSize, page },
+          },
+        );
+        return { items: result.data ?? [], headers: result.headers };
       },
-    );
-    const commitsResult = await this.app.requestAsInstallation<GitHubPullCommitPayload[]>(
-      request.installationId,
-      {
-        method: "GET",
-        path: `/repos/${owner}/${name}/pulls/${request.number}/commits`,
-        query: { per_page: 100 },
+    });
+    const commitsPage = await paginate({
+      pageSize: DEFAULT_PAGE_SIZE,
+      maxPages: Math.ceil(GITHUB_PR_COMMITS_LIMIT / DEFAULT_PAGE_SIZE),
+      maxItems: GITHUB_PR_COMMITS_LIMIT,
+      fetchPage: async (page, pageSize) => {
+        const result = await this.app.requestAsInstallation<GitHubPullCommitPayload[]>(
+          request.installationId,
+          {
+            method: "GET",
+            path: `/repos/${owner}/${name}/pulls/${request.number}/commits`,
+            query: { per_page: pageSize, page },
+          },
+        );
+        return { items: result.data ?? [], headers: result.headers };
       },
-    );
+    });
     const ingested: IngestedPull = {
       installationId: request.installationId,
       pull: mapPullPayload(pullResult.data, request.fullName),
-      files: (filesResult.data ?? []).flatMap((file) => {
+      files: filesPage.items.flatMap((file) => {
         const mapped = mapPullFile(file);
         return mapped === undefined ? [] : [mapped];
       }),
-      commits: (commitsResult.data ?? []).flatMap((commit) => {
+      commits: commitsPage.items.flatMap((commit) => {
         const mapped = mapPullCommit(commit);
         return mapped === undefined ? [] : [mapped];
       }),
       ingestedAt: this.clock.now().toISOString(),
+      truncated: filesPage.truncated || commitsPage.truncated,
     };
     return this.store.save(ingested);
   }

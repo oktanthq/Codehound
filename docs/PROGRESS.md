@@ -116,7 +116,7 @@ Code Intelligence Model is complete (OKT-55 through OKT-68). Persistence is `Cim
 
 MCP Project Intelligence Server is complete (OKT-69 through OKT-80). The server is a local JSON-RPC implementation (`McpServer`, stdio framing). Retrieval still uses the hashing embedder and in-memory vector store. No archived duplicates were skipped in OKT-69 through OKT-80.
 
-Intelligent PR Review is complete (OKT-81 through OKT-94). Detectors and GitHub review publishing use mocked HTTP; no live GitHub credentials are required.
+Intelligent PR Review is complete (OKT-81 through OKT-94). Detectors and GitHub review publishing inject a scripted `HttpClient` (`MockHttp`); no live GitHub credentials are required.
 
 Intelligent Code-Change Suggestions is complete (OKT-95 through OKT-106). Edits are local rewrites behind `generateSuggestions`; there is no hosted generation API. No archived duplicates were skipped in OKT-85 through OKT-106.
 

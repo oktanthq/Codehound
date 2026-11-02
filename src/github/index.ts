@@ -11,6 +11,7 @@ export { RepositoryDiscovery } from "./discovery.js";
 export { authenticatedCloneUrl, isFetchingGitCli, ProcessGitCli } from "./git.js";
 export { IncrementalIngestor } from "./incremental.js";
 export { defaultIngestRoot, RepositoryIngestor } from "./ingest.js";
+export { DEFAULT_PAGE_SIZE, MAX_PAGES, hasNextLink, paginate } from "./paginate.js";
 export {
   DEFAULT_RETRY_POLICY,
   InMemoryIngestJobStore,
@@ -55,6 +56,7 @@ export type {
   WebhookIngestResult,
 } from "./incremental.js";
 export type { IngestRequest, IngestSnapshot, RepositoryIngestorOptions } from "./ingest.js";
+export type { PaginateOptions, PaginateResult, PagedResponse } from "./paginate.js";
 export type {
   IngestJob,
   IngestJobAttempt,

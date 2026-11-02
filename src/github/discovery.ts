@@ -2,6 +2,7 @@ import type { GitHubApp } from "./app.js";
 import type { RepositoryAuthorizer } from "./authz.js";
 import { systemClock, type Clock } from "./clock.js";
 import { GitHubAppError } from "./errors.js";
+import { DEFAULT_PAGE_SIZE, MAX_PAGES, paginate } from "./paginate.js";
 import { mapGitHubRepository, type GitHubRepositoryPayload } from "./repository.js";
 import type { SelectionStore } from "./selection.js";
 import {
@@ -33,9 +34,6 @@ type InstallationRepositoriesResponse = {
   total_count: number;
   repositories: GitHubRepositoryPayload[];
 };
-
-const DEFAULT_PAGE_SIZE = 100;
-const MAX_PAGES = 100;
 
 function matchesFilter(repo: DiscoveredRepository, filter: RepositoryFilter): boolean {
   if (filter.includeArchived !== true && repo.archived) {
@@ -97,37 +95,35 @@ export class RepositoryDiscovery {
     const selectedNames = new Set(
       (await this.selections.list(installationId)).map((item) => item.fullName.toLowerCase()),
     );
-    const repositories: DiscoveredRepository[] = [];
-    let fetched = 0;
-
-    for (let page = 1; page <= MAX_PAGES; page += 1) {
-      const result = await this.app.requestAsInstallation<InstallationRepositoriesResponse>(
-        installationId,
-        {
-          method: "GET",
-          path: "/installation/repositories",
-          query: { per_page: this.pageSize, page },
-        },
-      );
-      const batch = result.data.repositories ?? [];
-      fetched += batch.length;
-      for (const payload of batch) {
-        const mapped = mapGitHubRepository(payload);
-        const discovered: DiscoveredRepository = {
-          ...mapped,
-          description: payload.description ?? undefined,
-          selected: selectedNames.has(mapped.fullName.toLowerCase()),
+    const paged = await paginate({
+      pageSize: this.pageSize,
+      maxPages: MAX_PAGES,
+      fetchPage: async (page, pageSize) => {
+        const result = await this.app.requestAsInstallation<InstallationRepositoriesResponse>(
+          installationId,
+          {
+            method: "GET",
+            path: "/installation/repositories",
+            query: { per_page: pageSize, page },
+          },
+        );
+        return {
+          items: result.data.repositories ?? [],
+          headers: result.headers,
+          totalCount: result.data.total_count,
         };
-        if (matchesFilter(discovered, filter)) {
-          repositories.push(discovered);
-        }
-      }
-      if (
-        batch.length === 0 ||
-        batch.length < this.pageSize ||
-        fetched >= result.data.total_count
-      ) {
-        break;
+      },
+    });
+    const repositories: DiscoveredRepository[] = [];
+    for (const payload of paged.items) {
+      const mapped = mapGitHubRepository(payload);
+      const discovered: DiscoveredRepository = {
+        ...mapped,
+        description: payload.description ?? undefined,
+        selected: selectedNames.has(mapped.fullName.toLowerCase()),
+      };
+      if (matchesFilter(discovered, filter)) {
+        repositories.push(discovered);
       }
     }
     return repositories;

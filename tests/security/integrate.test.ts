@@ -27,6 +27,7 @@ describe("security findings in PR reviews", () => {
         },
         files: [addedFile("src/routes.ts", ["export const n = 1;"])],
         commits: [],
+        truncated: false,
       },
     });
     const merged = mergeSecurityIntoReview(report, [

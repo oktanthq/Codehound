@@ -28,6 +28,7 @@ export const RULE_SEVERITY: Record<string, ReviewSeverity> = {
   "regression.fan-in": "high",
   "regression.export-removed": "high",
   "regression.test-removed": "medium",
+  "regression.related-code": "medium",
   "security.eval": "critical",
   "security.xss": "high",
   "security.shell": "high",

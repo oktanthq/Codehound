@@ -97,7 +97,7 @@ The MCP server speaks JSON-RPC 2.0 over newline-delimited stdio (and Content-Len
 
 ## Pull request review
 
-PR review talks to GitHub through the existing App installation client (mocked HTTP in tests).
+PR review talks to GitHub through the existing App installation client. Tests inject a scripted `HttpClient` (`MockHttp` in `tests/helpers/http.ts`) rather than the `fetch` transport.
 
 1. **Ingest** loads a pull request, its files, and commits, and stores them in `InMemoryPullStore`. `pull_request` webhooks can trigger the same path.
 2. **Diff analysis** parses unified patches into hunks and added/deleted line numbers.
@@ -105,7 +105,7 @@ PR review talks to GitHub through the existing App installation client (mocked H
 4. **Impact** asks the CIM for dependents, dependencies, layers, and rules of changed paths.
 5. **Detectors** scan added and deleted lines for smells, bad practices, architecture and rule violations, regression risk, and security sinks. A classifier can raise severity when a file has many dependents.
 6. **Comments and summary** turn findings into Markdown inline comments and a review body. High or critical findings request changes; a clean review approves.
-7. **Publish** posts that review through the GitHub App installation client (`pull_requests:write`). Tests mock HTTP.
+7. **Publish** posts that review through the GitHub App installation client (`pull_requests:write`). Tests inject `MockHttp`. To script a new GitHub call, register a route with `.on({ method, urlIncludes, body })`. Routes match by method and a URL substring; unmatched routes return 404.
 
 ## Code-change suggestions
 
@@ -131,6 +131,6 @@ Callers should import from `src/security` (or the package root) rather than talk
 ## Design rules
 
 - Secrets never appear in git, logs, or thrown error messages.
-- GitHub HTTP is behind a small client so tests do not need the network.
+- GitHub HTTP is behind the `HttpClient` interface so tests do not need the network. Tests inject `MockHttp` (`tests/helpers/http.ts`). The live `fetch` transport (`createFetchHttpClient`) is not covered by the default suite.
 - Selection and ingest stores are interfaces; the in-memory implementations are for tests and early local use.
 - Authorization is explicit: discovery, selection, and clone all go through the same authorizer.
